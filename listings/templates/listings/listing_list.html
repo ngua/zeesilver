@@ -1,0 +1,63 @@
+{% extends "listings/base.html" %}
+{% load bleach_tags zeesilver_extras %}
+{% block title %}Categories{{ block.super }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-4">
+    <div class="row h-100">
+      <aside class="col-12">
+        <h3 class="p-3">Categories</h3>
+        <hr class=>
+        <nav class="navbar navbar-expand navbar-dark bg-dark flex-md-column align-items-start m-4">
+          <div class="collapse navbar-collapse">
+            <ul class="flex-column navbar-nav w-100 justify-content-between">
+              {% for category in categories %}
+              <li class="nav-item">
+                <a class="nav-link p-2{% if category.name == current %} current{% endif %}"
+                   href="{% url 'listing-by-category' %}?category={{ category.name }}"
+                   >
+                   {{ category.name }}
+                </a>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </nav>
+      </aside>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="row">
+      {% for listing in object_list %}
+      <div class="col-lg-4 col-md-10 by-category mt-5 mt-lg-0">
+        <legend class="border-bottom">{{ listing.name }}</legend>
+        <div class="row mt-3">
+          <div class="col-sm mt-2">
+            <img id="pic" class="img-fluid float-lg-right float-sm-left" src="{{ listing.picture.url }}">
+          </div>
+          <div class="col mt-2">
+            <p class="text-muted mt-1"><em>Pieces</em>: {{ listing.pieces }}</p>
+            {% materials listing %}
+            <hr>
+            {{ listing.description|bleach|truncatewords_html:10 }}
+            <hr>
+            <div class="mt-4">
+              <a href="{{ listing.get_absolute_url }}">
+                <span
+                  class="fa-eye far fa-2x mx-3"
+                  style="color: gray;"
+                  data-toggle="tooltip"
+                  data-placement="bottom"
+                  title="Details">
+                </span>
+              </a>
+              {% add_to_cart listing %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

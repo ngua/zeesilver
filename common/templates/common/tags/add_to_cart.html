@@ -1,0 +1,12 @@
+<form id="form" class="d-inline" class="mx-3" action="" method="post">{% csrf_token %}
+  <button {% if listing.sold %}disabled{% endif %} type="submit" id="cart-button" class="cart-button">
+    <span
+      class="fa-cart-plus fas fa-2x"
+      style="color: gray;"
+      data-toggle="tooltip"
+      data-placement="bottom"
+      title="Add to cart">
+    </span>
+  </button>
+</form>
+

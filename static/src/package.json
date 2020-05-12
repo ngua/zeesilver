@@ -1,0 +1,20 @@
+{
+  "name": "src",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "config": {
+    "scss_src": "styles/scss/app.scss",
+    "scss_dest": "../styles/css/"
+  },
+  "scripts": {
+    "scss:compile": "node-sass -o $npm_package_config_scss_dest $npm_package_config_scss_src",
+    "scss:compile:watch": "node-sass -o $npm_package_config_scss_dest $npm_package_config_scss_src --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "node-sass": "^4.14.0"
+  },
+  "dependencies": {}
+}

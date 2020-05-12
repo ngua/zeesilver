@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+.env*
+.vim/
+test_data*
+static/styles/css/*
+static/src/node_modules
+media/

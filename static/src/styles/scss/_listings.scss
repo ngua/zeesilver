@@ -1,0 +1,68 @@
+@import 'vars';
+
+aside {
+  background-color: $dark-grey;
+
+  hr {
+    border-top: 1px solid $grey;
+  }
+
+  h3 {
+    font-family: $beth-ellen;
+    color: $snow;
+  }
+
+  .navbar-expand .navbar-collapse {
+    min-width: 100%;
+  }
+
+  .navbar-dark .navbar-nav .nav-link {
+    color: $snow;
+    font-size: 24px;
+    letter-spacing: .08em;
+    font-weight: lighter;
+
+    &:hover {
+      color: $light-blue;
+    }
+
+    &.current {
+      color: $light-yellow;
+      font-weight: 600;
+      cursor: default;
+      pointer-events: none;
+    }
+  }
+}
+
+#details {
+  div div img {
+    width: auto;
+    max-height: 300px;
+  }
+
+  legend {
+    font-family: $beth-ellen;
+  }
+
+  h3 {
+    font-family: $monserrat;
+  }
+}
+
+#related {
+  h3 {
+    font-family: $beth-ellen;
+  }
+
+  p {
+    font-family: $monserrat;
+    color: $snow;
+  }
+}
+
+.cart-button {
+  background: none;
+  padding: 0px;
+  border: none;
+}

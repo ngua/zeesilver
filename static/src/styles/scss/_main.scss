@@ -1,0 +1,169 @@
+@import 'vars';
+
+html {
+  height: 100%;
+}
+
+body {
+  padding-top: 60px;
+}
+
+legend {
+  font-family: $monserrat;
+  color: $grey;
+
+  .border-bottom {
+    color: black;
+  }
+
+}
+
+a {
+  color: $light-blue;
+
+  &:hover {
+    color: $light-blue;
+  }
+
+}
+
+#main {
+  min-height: 80%;
+  background: $snow;
+  min-height: 50vh;
+  margin-top: 30px;
+  border: .05rem dotted $light-grey;
+  padding: 20px;
+}
+
+.navbar {
+  background-color: $dark-grey;
+
+  .nav-item {
+    font-family: $monserrat;
+    color: $light-grey;
+
+    &:hover {
+      text-decoration: underline;
+      color: $light-yellow;
+    }
+  }
+}
+
+#carousel {
+  width: 100%;
+  max-height: 250px;
+  overflow: hidden;
+
+  div.wrapper {
+    background: #1d2227;
+    width: 100%;
+
+      img {
+        max-height: 150px;
+        filter: grayscale(100%);
+        float: right;
+
+        @include lg {
+          max-height: 220px;
+        }
+      }
+
+      div {
+        h3 {
+          font-family: $beth-ellen;
+        }
+
+        div.carousel-caption {
+           span {
+            font-family: $monserrat;
+            font-weight: lighter;
+            color: $light-grey;
+            font-size: 12px;
+
+            @include lg {
+              font-size: 26px;
+            }
+          }
+        }
+    }
+  }
+}
+
+.nav-wrapper {
+  position: relative;
+
+  small {
+    position: absolute;
+    left: 71px;
+    bottom: 0;
+    color: $light-blue;
+    font-family: 'Dawning of a New Day', sans-serif;
+    font-size: .9rem;
+  }
+}
+
+.btn-primary {
+  background-color: $light-blue;
+}
+
+.navbar-brand {
+  color: $light-grey;
+  background-color: $dark-grey;
+  font-family: 'Beth Ellen', sans-serif;
+  font-size: 32px;
+  padding-bottom: 10px;
+}
+
+.navbar-toggler {
+  color: $light-grey;
+}
+
+.prices {
+  padding: 10px 0 10px 0;
+  margin: 10px 0 10px 0;
+
+  div.block {
+    a {
+      h3, small {
+        font-family: $monserrat;
+        font-weight: bold;
+        color: black;
+      }
+    }
+
+    background: url("/static/img/boards.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 100px;
+    width: auto;
+    display: block;
+    opacity: .8
+  }
+}
+
+.card {
+  max-width: 28vh;
+  overflow: hidden;
+
+  p {
+    font-family: $monserrat;
+  }
+
+  img {
+    opacity: .7;
+    max-width: 100%;
+
+    &:hover {
+      transform: scale(1.04);
+      opacity: .9;
+      transition: all 1.2s;
+    }
+  }
+
+  .card-body {
+    .card-title {
+      font-family: $beth-ellen;
+    }
+  }
+}

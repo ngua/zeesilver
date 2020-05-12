@@ -1,0 +1,73 @@
+{% extends 'common/base.html' %}
+{% load static %}
+{% block title %}Home{% endblock %}
+{% block carousel %}
+<div class="container-fluid p-0 w-100">
+  <div id="carousel" class="carousel carousel-fade" data-ride="carousel" data-interval="50000">
+    <ol class="carousel-indicators">
+      {% for item in carousel %}
+      <li data-target="#carousel" data-slide-to="{{ forloop.counter0 }}" class="{% if forloop.counter == 1%} active {% endif %}"></li>
+      {% endfor %}
+    </ol>
+    <div class="carousel-inner wrapper">
+      {% for item in carousel %}
+      <div class="carousel-item">
+        {% with 'img/'|add:item.img|add:'.jpg' as img_path %}
+        <img class="d-block img-fluid {% if forloop.counter == 1%} active {% endif %}" src="{% static img_path %}">
+        {% endwith %}
+        <div class="carousel-caption d-md-block">
+          <h3>Zee Silver</h3>
+          <span class="">{{ item.caption }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-10">
+    <div class="text-center row justify-content-center">
+      <legend class="border-bottom mb-4">Browse by Price</legend>
+      {% for price in prices %}
+      <div class="prices m-2 col-md">
+        <div class="block">
+          <a href="">
+            <h3>${{ price }}</h3>
+            <small>And below</small>
+            <div>
+              <span class="fas fa-arrow-right" style="color:black;"></span>
+            </div>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="row text-center">
+      <legend class="border-bottom mt-3 mb-4">Browse by Category</legend>
+      {% for listing in examples %}
+      <div class="col d-flex justify-content-center">
+        <div class="card">
+          <img class="card-img-top img-fluid" src="{{ listing.picture.url }}">
+          <div class="card-body">
+            <h5 class="card-title">
+              {{ listing.category.name }}
+            </h5>
+            <div>
+              <p class="d-inline p-2">See more</p>
+              <a
+                href="{% url 'listing-by-category' %}?category={{ listing.category}}"
+                class="d-inline p-2">
+                <span class="fas fa-angle-double-right">
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock content %}

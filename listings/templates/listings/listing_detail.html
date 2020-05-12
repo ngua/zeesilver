@@ -1,0 +1,68 @@
+{% extends "listings/base.html" %}
+{% load bleach_tags zeesilver_extras %}
+{% block title %}Categories{{ block.super }}{% endblock %}
+{% block content %}
+<div id="details" class="row">
+  <div class="col-6">
+    <div class="row justify-content-center">
+      <div class="col-12 text-center">
+        <legend class="border-bottom">{{ listing.name }}</legend>
+      </div>
+    </div>
+    <div class="row h-100 justify-content-center align-items-center">
+      <div class="col-md-6">
+        <img id="pic" class="float-lg-right float-sm-left" src="{{ listing.picture.url }}">
+      </div>
+      <div class="col-md-6 mt-2">
+        <h3 class="details">{{ listing.price }}</h3>
+        {% materials listing %}
+        <p class="text-muted">Pieces: {{ listing.pieces }}</p>
+        <form id="form" class="d-inline" class="mx-3" action="" method="post">{% csrf_token %}
+          <button {% if listing.sold %}disabled{% endif %} type="submit" id="cart-button" class="cart-button">
+            <span
+              class="fa-cart-plus fas fa-2x"
+              style="color: gray;"
+              data-toggle="tooltip"
+              data-placement="bottom"
+              title="Add to cart">
+            </span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div id="related" class="col-md-4">
+    <div class="row h-100  mt-4 mt-lg-0">
+      <aside class="col-12">
+        <h3 class="p-3">More {{ listing.category }}</h3>
+        <hr class=>
+        <nav class="navbar navbar-expand navbar-dark bg-dark flex-md-column align-items-start m-4">
+          <div class="collapse navbar-collapse">
+            <ul class="flex-column navbar-nav w-100 justify-content-between">
+              {% for category in categories %}
+              <li class="nav-item">
+                <a class="nav-link p-2{% if category.name == current %} current{% endif %}"
+                   href="{% url 'listing-by-category' %}?category={{ category.name }}"
+                   >
+                   {{ category.name }}
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link p-2" href="">{{ category.name }}</a>
+              </li>
+              {% empty %}
+              <div>
+                <h3>
+                  This piece is unique!
+                </h3>
+                <p>Come back soon for more {{ listing.category.name }}</p>
+              </div>
+              {% endfor %}
+            </ul>
+          </div>
+        </nav>
+      </aside>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  web:
+    volumes:
+      - ./:/app
+    command: python manage.py runserver 0.0.0.0:8000 --settings=$DJANGO_SETTINGS_MODULE
+    ports:
+      - 8000:8000
+    env_file:
+      - ./.env.dev
+    depends_on:
+      - db
+
+  db:
+    image: postgres:12.2
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=zee
+      - POSTGRES_PASSWORD=zee
+      - POSTGRES_DB=zee_dev
+
+volumes:
+  app:
+  postgres_data:
