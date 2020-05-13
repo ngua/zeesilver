@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Beth+Ellen&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Beth+Ellen&family=Dawning+of+a+New+Day&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@200&display=swap');
 
 $screen-lg-min: 992px;
 
@@ -10,10 +11,12 @@ $grey: #424242;
 $light-blue: #66b0ff;
 $light-grey: #d8d8d8;
 $light-yellow: #f5e1a3;
+$medium-grey: #717171;
 $snow: #f8f8f8;
 
 $monserrat: 'Montserrat', sans-serif;
 $beth-ellen: 'Beth Ellen', sans-serif;
+$crimson: 'Crimson Pro', serif;
 
 @mixin lg {
   @media (min-width: #{$screen-lg-min}) {

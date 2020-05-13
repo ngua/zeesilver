@@ -2,62 +2,68 @@
 {% load bleach_tags zeesilver_extras %}
 {% block title %}Categories{{ block.super }}{% endblock %}
 {% block content %}
-<div id="details" class="row">
-  <div class="col-6">
+<div id="pic-modal" class="modal fade row" tabindex="-1">
+  <div class="col-10 col-md-6 col-lg-6 mx-auto">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+      <img class="img-fluid" src="{{ listing.picture.url }}" alt="">
+    </div>
+  </div>
+</div>
+<div class="row pb-3">
+  <div id="details" class="col-8">
     <div class="row justify-content-center">
       <div class="col-12 text-center">
-        <legend class="border-bottom">{{ listing.name }}</legend>
+        {% legend listing.name %}
       </div>
     </div>
     <div class="row h-100 justify-content-center align-items-center">
       <div class="col-md-6">
-        <img id="pic" class="float-lg-right float-sm-left" src="{{ listing.picture.url }}">
+        <a href="" data-toggle="modal" data-target="#pic-modal">
+          <img id="pic" class="float-lg-right float-sm-left" src="{{ listing.picture.url }}">
+        </a>
       </div>
       <div class="col-md-6 mt-2">
-        <h3 class="details">{{ listing.price }}</h3>
+        <h3>{{ listing.price }}</h3>
         {% materials listing %}
+        <hr>
         <p class="text-muted">Pieces: {{ listing.pieces }}</p>
-        <form id="form" class="d-inline" class="mx-3" action="" method="post">{% csrf_token %}
-          <button {% if listing.sold %}disabled{% endif %} type="submit" id="cart-button" class="cart-button">
-            <span
-              class="fa-cart-plus fas fa-2x"
-              style="color: gray;"
-              data-toggle="tooltip"
-              data-placement="bottom"
-              title="Add to cart">
-            </span>
-          </button>
-        </form>
+        <div class="description">
+          {{ listing.description|bleach }}
+        </div>
+        <hr>
+        {% include 'common/tags/add_to_cart.html' %}
       </div>
     </div>
   </div>
   <div id="related" class="col-md-4">
-    <div class="row h-100  mt-4 mt-lg-0">
+    <div class="row h-100">
       <aside class="col-12">
         <h3 class="p-3">More {{ listing.category }}</h3>
-        <hr class=>
-        <nav class="navbar navbar-expand navbar-dark bg-dark flex-md-column align-items-start m-4">
-          <div class="collapse navbar-collapse">
-            <ul class="flex-column navbar-nav w-100 justify-content-between">
-              {% for category in categories %}
-              <li class="nav-item">
-                <a class="nav-link p-2{% if category.name == current %} current{% endif %}"
-                   href="{% url 'listing-by-category' %}?category={{ category.name }}"
-                   >
-                   {{ category.name }}
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link p-2" href="">{{ category.name }}</a>
-              </li>
-              {% empty %}
-              <div>
-                <h3>
-                  This piece is unique!
-                </h3>
-                <p>Come back soon for more {{ listing.category.name }}</p>
-              </div>
-              {% endfor %}
+        <hr>
+        <nav class="navbar navbar-expand navbar-dark bg-dark flex-md-column align-items-center">
+          <div class="text-center pb-3">
+            {% for listing in related %}
+            <div class="wrapper">
+              <img src="{{ listing.picture.url }}">
+              <a href="{{ listing.get_absolute_url }}">
+                <div class="overlay">
+                  <span class="nav-link">{{ listing.name }}</span>
+                </div>
+              </a>
+            </div>
+            {% empty %}
+            <div>
+              <h3>
+                This piece is unique!
+              </h3>
+              <p>Come back soon to see more <em>{{ listing.category.name|lower }}</em></p>
+            </div>
+            {% endfor %}
             </ul>
           </div>
         </nav>

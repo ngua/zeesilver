@@ -3,7 +3,7 @@ from . import views
 
 
 urlpatterns = [
-    path('', views.ListingByCategoryListView.as_view(), name='listing-by-category'),
+    path('', views.ListingFilterView.as_view(), name='listing-filter'),
     path(
         '<str:category>/<slug:slug>/',
         views.ListingDetailView.as_view(), name='listing-detail'

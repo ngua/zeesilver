@@ -7,3 +7,4 @@ psycopg2==2.8.5
 django-ckeditor==5.9.0
 django-bleach==0.6.1
 django-money==1.1
+django-filter==2.2.0

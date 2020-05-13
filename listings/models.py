@@ -14,7 +14,7 @@ class CategoryQuerySet(models.QuerySet):
     def in_stock(self):
         return self.filter(
             listing__isnull=False
-        ).exclude(listing__sold=True)
+        ).filter(listing__sold=False).distinct()
 
 
 class CategoryManager(models.Manager):
@@ -45,6 +45,16 @@ class Category(models.Model):
         return self.name
 
 
+class Material(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __repr__(self):
+        return f"Model('{self.name}')"
+
+    def __str__(self):
+        return self.name
+
+
 class ListingQuerySet(models.QuerySet):
     def unsold(self):
         return self.filter(sold=False)
@@ -67,7 +77,7 @@ class Listing(models.Model):
     description = RichTextField()
     picture = models.ImageField(upload_to=listing_upload_path)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    materials = ArrayField(models.CharField(max_length=100))
+    materials = models.ManyToManyField(Material, blank=True)
     pieces = models.IntegerField(default=1)
     price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD')
     created = models.DateField(default=timezone.now)
@@ -89,6 +99,11 @@ class Listing(models.Model):
         if not self.id:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
+
+    def get_related(self, limit=10):
+        return Listing.objects.exclude(id=self.id).filter(
+            category=self.category
+        ).unsold()[:limit+1]
 
     def __repr__(self):
         return f"Listing('{self.name}', '{self.category}')"

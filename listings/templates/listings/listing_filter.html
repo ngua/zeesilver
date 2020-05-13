@@ -1,0 +1,104 @@
+{% extends "listings/base.html" %}
+{% load bleach_tags zeesilver_extras %}
+{% block title %}Categories{{ block.super }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-4">
+    <div class="row h-100">
+      <aside class="col-12 p-4">
+        <div data-target="#categories" data-toggle="collapse">
+          <h3 class="p-3 d-inline">Categories</h3>
+          <i style="color: white;" class="fas fa-plus d-inline float-right p-3"></i>
+        </div>
+        <div>
+          <hr>
+          <div id="categories" class="collapse show">
+            <nav class="navbar navbar-expand navbar-dark bg-dark flex-md-column align-items-start m-4">
+              <div>
+                <ul class="flex-column navbar-nav w-100 justify-content-between">
+                  {% for category in categories_in_stock %}
+                  <li class="nav-item">
+                    <a class="nav-link p-2{% if category.name == current %} current{% endif %}"
+                       href="{% url 'listing-filter' %}?price__lte={{ current_price }}&category={{ category.name }}"
+                       >
+                       {{ category.name }}
+                    </a>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </nav>
+          </div>
+        </div>
+        <div>
+          <div data-target="#prices" data-toggle="collapse">
+            <h3 class="p-3 d-inline">By Price</h3>
+            <i style="color: white;" class="fas fa-plus d-inline float-right p-3"></i>
+          </div>
+          <hr>
+          <div id="prices" class="collapse show">
+            <nav class="navbar navbar-expand navbar-dark bg-dark flex-md-column align-items-start m-4">
+              <div>
+                <ul class="flex-column navbar-nav w-100 justify-content-between">
+                  {% for price in prices %}
+                  <li class="nav-item">
+                    <a class="nav-link p-2{% if price.amount == current_price %} current{% endif %}"
+                       href="{% url 'listing-filter' %}?price__lte={{ price.amount }}&category={{ current }}"
+                       >
+                       {{ price }} <small class="text-muted">and under</small>
+                    </a>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </nav>
+          </div>
+        </div>
+        <div>
+          <a href="{% url 'listing-filter' %}" class="btn btn-secondary mx-auto">
+            Clear All
+            <span class="fas fa-times-circle"></span>
+          </a>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <div class="list col-md-8">
+    <div class="row">
+      {% for listing in object_list %}
+      <div class="col-lg-4 col-md-10 by-category mt-5 mt-lg-0">
+        {% legend listing.name|truncatewords:5 %}
+        <div class="row mt-3">
+          <div class="col-sm mt-2">
+            <img id="pic" class="img-fluid float-lg-right float-sm-left" src="{{ listing.picture.url }}">
+          </div>
+          <div class="col mt-2">
+            <p class="text-muted mt-1"><em>Pieces</em>: {{ listing.pieces }}</p>
+            {% materials listing %}
+            <hr>
+            {{ listing.description|bleach|truncatewords_html:10 }}
+            <hr>
+            <div class="mt-4">
+              <a href="{{ listing.get_absolute_url }}">
+                <span
+                  class="fa-eye far fa-2x mx-3"
+                  style="color: gray;"
+                  data-toggle="tooltip"
+                  data-placement="bottom"
+                  title="Details">
+                </span>
+              </a>
+              {% add_to_cart listing %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12">
+        {% include 'common/tags/empty_qs.html' %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

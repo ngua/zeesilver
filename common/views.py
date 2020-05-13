@@ -15,9 +15,7 @@ def index(request):
         CarouselItem(*item) for item in items
     ]
     examples = Category.objects.get_example_listings()
-    prices = range(100, 400, 100)
     context = {
-        'prices': prices,
         'carousel': carousel,
         'examples': examples
     }

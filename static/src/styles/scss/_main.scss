@@ -28,9 +28,8 @@ a {
 }
 
 #main {
-  min-height: 80%;
+  min-height: 80vh;
   background: $snow;
-  min-height: 50vh;
   margin-top: 30px;
   border: .05rem dotted $light-grey;
   padding: 20px;
@@ -88,6 +87,10 @@ a {
         }
     }
   }
+}
+
+#footer {
+  padding: 20px 0 20px 0;
 }
 
 .nav-wrapper {
@@ -165,5 +168,11 @@ a {
     .card-title {
       font-family: $beth-ellen;
     }
+  }
+}
+
+.empty {
+  h1 {
+    font-family: $beth-ellen;
   }
 }
