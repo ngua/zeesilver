@@ -2,10 +2,12 @@
 
 html {
   height: 100%;
+  scroll-behavior: smooth;
 }
 
-body {
+body, body-wrapper {
   padding-top: 60px;
+  min-height: 100vh;
 }
 
 legend {
@@ -15,7 +17,6 @@ legend {
   .border-bottom {
     color: black;
   }
-
 }
 
 a {
@@ -27,12 +28,120 @@ a {
 
 }
 
+ul.crumb {
+  display: block ruby;
+  padding: 0 0 0 0;
+
+  li {
+    list-style: none;
+    font-family: $crimson;
+    display: inline-block;
+
+    a {
+      color: #5790cc;
+      font-weight: bold;
+    }
+
+    &:after {
+      @include icon("\f054", $light-grey);
+    }
+
+    &.active {
+      color: $medium-grey;
+
+      &:after {
+        content: "";
+        padding: 0 0 0 0;
+      }
+    }
+  }
+}
+
 #main {
-  min-height: 80vh;
+  flex: 1 1 auto;
   background: $snow;
   margin-top: 30px;
   border: .05rem dotted $light-grey;
-  padding: 20px;
+  padding: 60px;
+}
+
+#carousel {
+  width: 100%;
+  max-height: 250px;
+  overflow: hidden;
+
+  div.wrapper {
+    background: #1d2227;
+    width: 100%;
+
+    img {
+      max-height: 150px;
+      filter: grayscale(100%);
+      float: right;
+
+      @include lg {
+        max-height: 220px;
+      }
+    }
+
+    div {
+      h3 {
+        font-family: $beth-ellen;
+      }
+
+      div.carousel-caption {
+        span {
+          font-family: $monserrat;
+          font-weight: lighter;
+          color: $light-grey;
+          font-size: 12px;
+
+          @include lg {
+            font-size: 26px;
+          }
+        }
+      }
+    }
+  }
+}
+
+#footer {
+  padding: 20px 0 20px 0;
+}
+
+#search {
+  input {
+    font-family: $monserrat;
+    color: $medium-grey;
+    background: none;
+    border: none;
+    outline: none;
+    visibility: hidden;
+    box-shadow: none;
+    width: 0px;
+    opacity: 0;
+    transition: visibility 0s, opacity 1.5s, width .5s ease-in-out;
+  }
+
+  .fa-search {
+    display: inline-block;
+    cursor: pointer;
+    transition: all .2s ease-in-out;
+    color: $light-grey;
+  }
+
+  &:hover, &:active, &:focus {
+    input {
+      visibility: visible;
+      opacity: 1;
+      width: 200px;
+      border-bottom: 1px solid gray;
+    }
+
+    .fa-search {
+      transform: translateX(35%);
+    }
+  }
 }
 
 .navbar {
@@ -47,50 +156,6 @@ a {
       color: $light-yellow;
     }
   }
-}
-
-#carousel {
-  width: 100%;
-  max-height: 250px;
-  overflow: hidden;
-
-  div.wrapper {
-    background: #1d2227;
-    width: 100%;
-
-      img {
-        max-height: 150px;
-        filter: grayscale(100%);
-        float: right;
-
-        @include lg {
-          max-height: 220px;
-        }
-      }
-
-      div {
-        h3 {
-          font-family: $beth-ellen;
-        }
-
-        div.carousel-caption {
-           span {
-            font-family: $monserrat;
-            font-weight: lighter;
-            color: $light-grey;
-            font-size: 12px;
-
-            @include lg {
-              font-size: 26px;
-            }
-          }
-        }
-    }
-  }
-}
-
-#footer {
-  padding: 20px 0 20px 0;
 }
 
 .nav-wrapper {
@@ -127,26 +192,25 @@ a {
   margin: 10px 0 10px 0;
 
   div.block {
-    a {
-      h3, small {
-        font-family: $monserrat;
-        font-weight: bold;
-        color: black;
-      }
-    }
-
     background: url("/static/img/boards.jpg");
     background-size: cover;
     background-repeat: no-repeat;
     height: 100px;
+    padding: 25px;
     width: auto;
-    display: block;
-    opacity: .8
+
+    a {
+      h3, small {
+        font-family: $monserrat;
+        font-weight: bold;
+        color: $dark-grey;
+      }
+    }
   }
 }
 
 .card {
-  max-width: 28vh;
+  max-width: 300px;
   overflow: hidden;
 
   p {

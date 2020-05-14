@@ -4,6 +4,12 @@ aside {
   background-color: $dark-grey;
   padding-bottom: 10px;
 
+  a {
+    &.btn.btn-secondary {
+      padding: 10px;
+    }
+  }
+
   div[data-toggle="collapse"] {
     cursor: pointer;
   }
@@ -40,6 +46,22 @@ aside {
       font-weight: 600;
       cursor: default;
       pointer-events: none;
+    }
+  }
+
+  div.sort {
+    position: relative;
+
+    span {
+      position: absolute;
+
+      &.fa-sort-up {
+        top: 0
+      }
+
+      &.fa-sort-down {
+        bottom: 0
+      }
     }
   }
 }
@@ -141,6 +163,37 @@ aside {
   button {
     margin-right: 6px;
     color: rgba(220, 220, 220, .9);
+  }
+}
+
+#pagination {
+  display: block ruby;
+
+  li {
+    font-family: $crimson;
+    list-style: none;
+
+    a span {
+      &.prev {
+        &:after {
+          @include icon("\f053");
+        }
+      }
+
+      &.next {
+        &:after {
+          @include icon("\f054");
+        }
+      }
+    }
+  }
+}
+
+#to-top {
+  a span {
+    &:after {
+      @include icon("\f077");
+    }
   }
 }
 

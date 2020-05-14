@@ -1,72 +1,45 @@
 {% extends "listings/base.html" %}
 {% load bleach_tags zeesilver_extras %}
-{% block title %}Categories{{ block.super }}{% endblock %}
+{% block breadcrumb %}
+{{ block.super }}
+<li class="active">Gallery</li>
+{% endblock %}
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-4">
-    <div class="row h-100">
-      <aside class="col-12 p-4">
-        <div data-target="#categories" data-toggle="collapse">
-          <h3 class="p-3 d-inline">Categories</h3>
-          <i style="color: white;" class="fas fa-plus d-inline float-right p-3"></i>
-        </div>
-        <div>
-          <hr>
-          <div id="categories" class="collapse show">
-            <nav class="navbar navbar-expand navbar-dark bg-dark flex-md-column align-items-start m-4">
-              <div>
-                <ul class="flex-column navbar-nav w-100 justify-content-between">
-                  {% for category in categories_in_stock %}
-                  <li class="nav-item">
-                    <a class="nav-link p-2{% if category.name == current %} current{% endif %}"
-                       href="{% url 'listing-filter' %}?price__lte={{ current_price }}&category={{ category.name }}"
-                       >
-                       {{ category.name }}
-                    </a>
-                  </li>
-                  {% endfor %}
-                </ul>
-              </div>
-            </nav>
-          </div>
-        </div>
-        <div>
-          <div data-target="#prices" data-toggle="collapse">
-            <h3 class="p-3 d-inline">By Price</h3>
-            <i style="color: white;" class="fas fa-plus d-inline float-right p-3"></i>
-          </div>
-          <hr>
-          <div id="prices" class="collapse show">
-            <nav class="navbar navbar-expand navbar-dark bg-dark flex-md-column align-items-start m-4">
-              <div>
-                <ul class="flex-column navbar-nav w-100 justify-content-between">
-                  {% for price in prices %}
-                  <li class="nav-item">
-                    <a class="nav-link p-2{% if price.amount == current_price %} current{% endif %}"
-                       href="{% url 'listing-filter' %}?price__lte={{ price.amount }}&category={{ current }}"
-                       >
-                       {{ price }} <small class="text-muted">and under</small>
-                    </a>
-                  </li>
-                  {% endfor %}
-                </ul>
-              </div>
-            </nav>
-          </div>
-        </div>
-        <div>
-          <a href="{% url 'listing-filter' %}" class="btn btn-secondary mx-auto">
+<div id="top" class="row justify-content-center">
+  <div class="col-lg-3 col-sm-12">
+    <div class="row">
+      <aside class="col-12 p-3 px-0">
+        {% filter_options 'categories' option='categories' %}
+        {% filter_options 'by price' option='prices' %}
+        <div class="pb-3">
+          <a href="{% url 'listing-filter' %}" class="btn btn-secondary d-inline mx-3">
             Clear All
             <span class="fas fa-times-circle"></span>
+          </a>
+          <a
+            href="
+            {% if current_order == 'price' %}
+            {% filter_href current_category current_price "-price" page_obj.number %}
+            {% else %}
+            {% filter_href current_category current_price "price" page_obj.number %}
+            {% endif %}"
+            class="btn btn-secondary mx-auto d-inline">
+            Price
+            <div class="d-inline mx-3 sort">
+              {% with '#ffd90c' as yellow %}
+              <span class="fas fa-sort-up" style="{% if current_order == 'price' %}color: {{ yellow }};{% endif %}"></span>
+              <span class="fas fa-sort-down" style="{% if current_order == '-price' %}color: {{ yellow }};{% endif %}"></span>
+              {% endwith %}
+            </div>
           </a>
         </div>
       </aside>
     </div>
   </div>
-  <div class="list col-md-8">
-    <div class="row">
-      {% for listing in object_list %}
-      <div class="col-lg-4 col-md-10 by-category mt-5 mt-lg-0">
+  <div class="list col-lg-8 col-sm-12">
+    <div class="row mt-3 mt-lg-0">
+      {% for listing in page_obj %}
+      <div class="col-lg-4 col-sm-10 by-category mt-5 mt-lg-0">
         {% legend listing.name|truncatewords:5 %}
         <div class="row mt-3">
           <div class="col-sm mt-2">
@@ -99,6 +72,56 @@
       </div>
       {% endfor %}
     </div>
+    <div class="row">
+      <div class="col-lg-6 col-sm-12 pt-4 mx-auto text-center">
+        <hr>
+        {% if is_paginated %}
+        <ul id="pagination">
+          {% if page_obj.has_previous %}
+          <li><a class="btn btn-sm btn-outline-secondary" href="{% filter_href current_category current_price current_order 1 %}">First</a></li>
+          <li>
+            <a href="{% filter_href current_category current_price current_order page_obj.previous_page_number %}">
+              <span class="prev"></span>
+            </a>
+          </li>
+          {% endif %}
+
+          {% for n in page_obj.paginator.page_range %}
+          {% if page_obj.number == n %}
+          <li class=""><span class="btn btn-sm btn-outline-secondary">{{ page_obj.number }}</span></li>
+          {% elif n > page_obj.number|add:'-3' and n < page_obj.number|add:'3' %}
+          <li><a class="btn btn-sm btn-secondary" href="{% filter_href current_category current_price current_order n %}">{{ n }}</a></li>
+          {% else %}
+          ...
+          {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+          <li>
+            <a href="{% filter_href current_category current_price current_order page_obj.next_page_number %}">
+              <span class="next"></span>
+            </a>
+          </li>
+          <li><a class="btn btn-sm btn-outline-secondary" href="{% filter_href current_category current_price current_order page_obj.paginator.num_pages %}">Last</a></li>
+          {% endif %}
+        </ul>
+        {% endif %}
+      </div>
+      <div id="to-top" class="d-lg-none col-sm-12 text-center">
+        <a href="#top"><span></span></a>
+      </div>
+    </div>
   </div>
 </div>
+{% endblock %}
+{% block body_js %}
+<script>
+  const togglers = document.querySelectorAll('.toggler');
+  Array.prototype.map.call(togglers, (toggler => {
+    const icon = toggler.querySelector('.fas')
+    toggler.addEventListener('click', () => {
+      icon.classList.replace('fa-plus', 'fa-minus') || icon.classList.replace('fa-minus', 'fa-plus');
+    });
+  }));
+</script>
 {% endblock %}

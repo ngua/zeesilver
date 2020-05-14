@@ -6,16 +6,21 @@ from .filters import ListingFilter
 
 class ListingFilterView(FilterView):
     filterset_class = ListingFilter
+    queryset = Listing.objects.unsold()
+    paginate_by = 6
 
     def get_context_data(self, *args, **kwargs):
-        current_price = self.request.GET.get('price__lte', '')
+        price = self.request.GET.get('price__lte', '')
         category = self.request.GET.get('category', '')
-        if current_price and current_price.isnumeric():
-            current_price = int(current_price)
+        order = self.request.GET.get('order_by', 'price')
+        if price and price.isnumeric():
+            price = int(price)
+
         context = super().get_context_data(*args, **kwargs)
         context.update({
-            'current': category,
-            'current_price': current_price
+            'current_category': category,
+            'current_price': price,
+            'current_order': order
         })
         return context
 
