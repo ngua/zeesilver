@@ -3,15 +3,22 @@ from django.urls import reverse
 from django.conf import settings
 from django.utils import timezone
 from django.utils.text import slugify
-from django.db.models import signals
+from django.db.models import signals, TextField, Value as V
+from django.db.models.functions import Concat
 from django.dispatch import receiver
-from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVectorField, SearchVector
+from django.contrib.postgres.aggregates import StringAgg
 from djmoney.models.fields import MoneyField
 from ckeditor.fields import RichTextField
 
 
 class CategoryQuerySet(models.QuerySet):
     def in_stock(self):
+        """
+        Returns all Category instances with at least one unsold related
+        Listing object
+        """
         return self.filter(
             listing__isnull=False
         ).filter(listing__sold=False).distinct()
@@ -25,6 +32,11 @@ class CategoryManager(models.Manager):
         return self.get_queryset().in_stock()
 
     def get_example_listings(self):
+        """
+        Yields one example Listing instance for each category
+        with at least one unsold related Listing. For use in
+        the index view
+        """
         for category in self.in_stock().distinct():
             yield category.listing_set.unsold().first()
 
@@ -60,9 +72,40 @@ class ListingQuerySet(models.QuerySet):
         return self.filter(sold=False)
 
 
-class ListingManager(models.Manager):
+class ListingManager(models.Manager.from_queryset(ListingQuerySet)):
     def get_queryset(self):
-        return ListingQuerySet(self.model, using=self._db)
+        """
+        Creates a field for aggregating all text fields into a single
+        searchable value. Postgres' SearchVector cannot include joined
+        fields since it uses Django's F expression, so this step is
+        necessary to search Listing through the Category and Material `name`
+        attributes in the Listing SearchVectorField
+        """
+        return super().get_queryset().annotate(
+            summary=Concat(
+                'name', V(' '),
+                'description', V(' '),
+                'category__name', V(' '),
+                StringAgg('materials__name', delimiter=' '),
+                output_field=TextField()
+            )
+        )
+
+    def query_summary(self):
+        """
+        Adds the annotated `summary` value to the queryset. For
+        use in the Listing `save` method for post-save search
+        vector update
+        """
+        vector = (
+            SearchVector('name', weight='A') +
+            SearchVector('description', weight='C') +
+            SearchVector('category__name', weight='B') +
+            SearchVector(StringAgg(
+                'materials__name', delimiter=' '
+            ), weight='A')
+        )
+        return self.get_queryset().annotate(summary=vector)
 
     def unsold(self):
         return self.get_queryset().unsold()
@@ -83,8 +126,13 @@ class Listing(models.Model):
     created = models.DateField(default=timezone.now)
     sold = models.BooleanField(default=False)
     slug = models.SlugField(editable=False)
+    search_vector = SearchVectorField(null=True)
 
     objects = ListingManager()
+
+    class Meta:
+        indexes = [GinIndex(fields=['search_vector'])]
+        ordering = ['-price']
 
     def get_absolute_url(self):
         return reverse(
@@ -96,14 +144,40 @@ class Listing(models.Model):
         )
 
     def save(self, *args, **kwargs):
+        """
+        Overrides `save` in order to:
+        1. Generate a slug once, ensuring that name changes do not
+        affect existing slug, otherwise existing URLs might 404
+        2. Update the instance's `search_vector` by aggregating
+        newly saved data, updating the field, and then re-saving,
+        the instance, making sure that `save` is not being called
+        specifically to update the search vector
+        TODO Update vector asynchronously (celery task?)
+        """
         if not self.id:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
+        if 'search_vector' not in kwargs.get('update_fields', {}):
+            instance = Listing.objects.query_summary().get(pk=self.pk)
+            instance.update_vector()
 
     def get_related(self, limit=10):
+        """
+        Returns list of Listing objects with the same category
+        as the instance, for use in detail view sidebar
+        """
         return Listing.objects.exclude(id=self.id).filter(
             category=self.category
         ).unsold()[:limit+1]
+
+    def update_vector(self):
+        """
+        Calls the ListingManager `query_summary` method to
+        update the `summary` aggregate value and update the
+        search vector
+        """
+        self.search_vector = self.summary
+        self.save(update_fields=['search_vector'])
 
     def __repr__(self):
         return f"Listing('{self.name}', '{self.category}')"
@@ -115,3 +189,21 @@ class Listing(models.Model):
 @receiver(signals.post_delete, sender=Listing)
 def auto_delete_picture(sender, instance, **kwargs):
     instance.picture.delete(save=False)
+
+
+@receiver(signals.post_save, sender=Category)
+def category_updated(sender, instance, **kwargs):
+    for listing in instance.listing_set.query_summary():
+        listing.save()
+
+
+@receiver(signals.post_save, sender=Material)
+def materials_updated(sender, instance, **kwargs):
+    for listing in instance.listing_set.query_summary():
+        listing.save()
+
+
+@receiver(signals.m2m_changed, sender=Listing.materials.through)
+def update_materials_m2m(sender, instance, action, **kwargs):
+    if action in ['post_save', 'post_clear', 'post_add']:
+        instance.save()
