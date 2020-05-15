@@ -28,10 +28,12 @@
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-12">
-    <div class="text-center row justify-content-center">
-      <legend class="border-bottom mb-4">Browse by Price</legend>
+    <div class="row justify-content-center">
+      <div class="col-12 text-center">
+        <legend class="border-bottom mb-4">Browse by Price</legend>
+      </div>
       {% for price in prices %}
-      <div class="prices m-2 col-md-3 col-sm-12">
+      <div class="prices m-2 col-md-3 col-sm-12 text-center">
         <div class="block h-100">
           <a href="{% url 'listing-filter' %}?price__lte={{ price.amount }}">
             <h3>{{ price }}</h3>
@@ -44,13 +46,13 @@
       </div>
       {% endfor %}
     </div>
-    <div class="d-flex row justify-content-center">
+    <div class="row justify-content-center">
       <div class="col-12 text-center">
         <legend class="border-bottom mt-3 mb-4">Browse by Category</legend>
       </div>
       {% for listing in examples %}
       <div class="col-md-auto col-sm-12 m-3 text-center">
-        <div class="card">
+        <div class="card mx-auto">
           <img class="card-img-top img-fluid" src="{{ listing.picture.url }}">
           <div class="card-body">
             <h5 class="card-title">

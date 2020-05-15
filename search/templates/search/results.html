@@ -2,6 +2,8 @@
 {% load static bleach_tags zeesilver_extras %}
 {% block title %}Search{% endblock %}
 {% block breadcrumb %}
+<li><a href="{% url 'index' %}">Home</a></li>
+<li class="active">Search Results</li>
 {% endblock %}
 {% block content %}
 <div id="results" class="row justify-content-center">
@@ -35,7 +37,7 @@
         </div>
       </div>
       {% empty %}
-      <div class="col-lg-10 col-sm12">
+      <div class="col-12">
         {% empty_qs heading="No results found!" lead="We couldn't find and matching results for "|add:q text="Please try a different search." %}
       </div>
     </div>
