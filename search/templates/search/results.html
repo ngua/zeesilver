@@ -1,0 +1,81 @@
+{% extends "common/base.html" %}
+{% load static bleach_tags zeesilver_extras %}
+{% block title %}Search{% endblock %}
+{% block breadcrumb %}
+{% endblock %}
+{% block content %}
+<div id="results" class="row justify-content-center">
+  <div class="col-lg-10 col-sm-12">
+    {% if object_list %}
+    {% legend "Results for '"|add:q|add:"'" %}
+    {% endif %}
+    <div id="results" class="row p-2">
+      {% for listing in page_obj %}
+      <div class="col-lg-6 col-sm-12 py-3 border-bottom">
+        <div class="row justify-content-center">
+          <div class="col-lg-6 col-sm-12 align-self-center">
+            <div class="d-block">
+              <a href="{{ listing.get_absolute_url }}">
+                <h5>{{ listing.name }}</h5>
+              </a>
+            </div>
+            <div class="d-block pb-2">
+              {{ listing.description|bleach|truncatewords:10 }}
+            </div>
+            <div class="d-block pb-2">
+              {% materials listing %}
+            </div>
+            <div class="d-block pb-2">
+              {% add_or_view listing size='fa-md' %}
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6">
+            <img class="img-fluid" src="{{ listing.picture.url }}" alt="">
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-lg-10 col-sm12">
+        {% empty_qs heading="No results found!" lead="We couldn't find and matching results for "|add:q text="Please try a different search." %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-sm-12 pt-4 mx-auto text-center">
+      <hr>
+      {% if is_paginated %}
+      <ul id="pagination">
+        {% if page_obj.has_previous %}
+        <li><a class="btn btn-sm btn-outline-secondary" href="?page={{ 1 }}">First</a></li>
+        <li>
+          <a href="?page={{ page_obj.previous_page_number }}">
+            <span class="prev"></span>
+          </a>
+        </li>
+        {% endif %}
+
+        {% for n in page_obj.paginator.page_range %}
+        {% if page_obj.number == n %}
+        <li class=""><span class="btn btn-sm btn-outline-secondary">{{ page_obj.number }}</span></li>
+        {% elif n > page_obj.number|add:'-3' and n < page_obj.number|add:'3' %}
+        <li><a class="btn btn-sm btn-secondary" href="?page={{ n }}">{{ n }}</a></li>
+        {% else %}
+        ...
+        {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li>
+          <a href="?page={{ page_obj.next_page_number }}">
+            <span class="next"></span>
+          </a>
+        </li>
+        <li><a class="btn btn-sm btn-outline-secondary" href="?page={{ page_obj.num_pages }}">Last</a></li>
+        {% endif %}
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -52,23 +52,14 @@
             {{ listing.description|bleach|truncatewords_html:10 }}
             <hr>
             <div class="mt-4">
-              <a href="{{ listing.get_absolute_url }}">
-                <span
-                  class="fa-eye far fa-2x mx-3"
-                  style="color: gray;"
-                  data-toggle="tooltip"
-                  data-placement="bottom"
-                  title="Details">
-                </span>
-              </a>
-              {% add_to_cart listing %}
+              {% add_or_view listing %}
             </div>
           </div>
         </div>
       </div>
       {% empty %}
       <div class="col-12">
-        {% include 'common/tags/empty_qs.html' %}
+        {% empty_qs heading="We're sold out!" lead="Looks like we're all sold out." text="Come back soon to see more of Zee's original creations!" %}
       </div>
       {% endfor %}
     </div>

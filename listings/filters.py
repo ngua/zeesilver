@@ -11,4 +11,4 @@ class ListingFilter(FilterSet):
 
     class Meta:
         model = Listing
-        fields = ['category', 'price']
+        fields = ['category', 'price', 'materials']

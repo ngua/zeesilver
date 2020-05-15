@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('common.urls')),
     path('gallery/', include('listings.urls')),
+    path('search/', include('search.urls')),
 ]
 
 if os.environ.get('DJANGO_SETTINGS_MODULE') == 'settings.dev':

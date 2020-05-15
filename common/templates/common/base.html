@@ -29,8 +29,8 @@
             </div>
             <div class="navbar-nav ml-auto">
               <div class="search-wrappper">
-                <form id="search" class="" action="" method="GET">
-                  <input class="" type="search" name="q" placeholder="Search..." required>
+                <form id="search" class="" action="{% url 'search' %}" method="GET">
+                  <input type="search" name="q" placeholder="Search..." required>
                   <i id="search-icon" class="fas fa-search"></i>
                 </form>
               </div>

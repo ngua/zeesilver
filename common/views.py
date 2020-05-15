@@ -1,5 +1,5 @@
 from collections import namedtuple
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from listings.models import Category
 
 

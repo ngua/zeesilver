@@ -1,0 +1,21 @@
+<a href="{{ listing.get_absolute_url }}">
+  <span
+    class="fa-eye far {{ size }} mx-3"
+    style="color: gray;"
+    data-toggle="tooltip"
+    data-placement="bottom"
+    title="Details">
+  </span>
+</a>
+<form class="d-inline" action="" method="post">{% csrf_token %}
+  <input type="hidden" name="listing" value="{{ listing.slug }}">
+  <button {% if listing.sold %}disabled{% endif %} type="submit" class="cart-button">
+    <span
+      class="fa-cart-plus fas {{ size }}"
+      style="color: gray;"
+      data-toggle="tooltip"
+      data-placement="bottom"
+      title="Add to cart">
+    </span>
+  </button>
+</form>

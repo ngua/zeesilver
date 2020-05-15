@@ -63,6 +63,7 @@ ul.crumb {
   margin-top: 30px;
   border: .05rem dotted $light-grey;
   padding: 60px;
+  min-height: 70vh;
 }
 
 #carousel {
@@ -107,40 +108,13 @@ ul.crumb {
 
 #footer {
   padding: 20px 0 20px 0;
-}
+  min-height: 60px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
 
-#search {
-  input {
-    font-family: $monserrat;
-    color: $medium-grey;
-    background: none;
-    border: none;
-    outline: none;
-    visibility: hidden;
-    box-shadow: none;
-    width: 0px;
-    opacity: 0;
-    transition: visibility 0s, opacity 1.5s, width .5s ease-in-out;
-  }
-
-  .fa-search {
-    display: inline-block;
-    cursor: pointer;
-    transition: all .2s ease-in-out;
-    color: $light-grey;
-  }
-
-  &:hover, &:active, &:focus {
-    input {
-      visibility: visible;
-      opacity: 1;
-      width: 200px;
-      border-bottom: 1px solid gray;
-    }
-
-    .fa-search {
-      transform: translateX(35%);
-    }
+  @include lg {
+    padding-bottom: 80px;
   }
 }
 

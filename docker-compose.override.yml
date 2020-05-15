@@ -4,7 +4,7 @@ services:
   web:
     volumes:
       - ./:/app
-    command: python manage.py runserver 0.0.0.0:8000 --settings=$DJANGO_SETTINGS_MODULE
+    command: python manage.py runserver 0.0.0.0:8000 --settings=settings.dev
     ports:
       - 8000:8000
     env_file:

@@ -9,9 +9,9 @@ def materials(listing):
     return {'listing': listing}
 
 
-@register.inclusion_tag('common/tags/add_to_cart.html')
-def add_to_cart(listing):
-    return {'listing': listing}
+@register.inclusion_tag('common/tags/add_or_view.html')
+def add_or_view(listing, size='fa-lg'):
+    return {'listing': listing, 'size': size}
 
 
 @register.inclusion_tag('common/tags/legend.html')
@@ -42,3 +42,12 @@ def filter_href(category, price, order, page):
         f"?category={category}&price__lte={price}"
         f"&order_by={order}&page={page}"
     )
+
+
+@register.inclusion_tag('common/tags/empty_qs.html')
+def empty_qs(heading, lead, text=''):
+    return {
+        'heading': heading,
+        'lead': lead,
+        'text': text
+    }

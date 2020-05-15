@@ -94,10 +94,6 @@ aside {
     font-family: $crimson;
     border-left: 1px solid $light-grey;
     color: $medium-grey;
-
-    @include lg {
-      max-width: 80%;
-    }
   }
 }
 
