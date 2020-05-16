@@ -44,8 +44,8 @@ def filter_href(category, price, order, page):
     )
 
 
-@register.inclusion_tag('common/tags/empty_qs.html')
-def empty_qs(heading, lead, text=''):
+@register.inclusion_tag('common/tags/jumbotron.html')
+def jumbotron(heading, lead, text=''):
     return {
         'heading': heading,
         'lead': lead,

@@ -30,9 +30,12 @@ INSTALLED_APPS = [
     'djmoney',
     'ckeditor',
     'django_bleach',
+    'crispy_forms',
+    'honeypot',
     'common',
     'listings',
-    'search'
+    'search',
+    'contact'
 ]
 
 MIDDLEWARE = [
@@ -164,8 +167,8 @@ BLEACH_ALLOWED_ATTRIBUTES = [
     'href', 'title', 'name', 'style', 'border', 'cellpadding', 'cellspacing'
 ]
 BLEACH_ALLOWED_STYLES = [
-    'font-family', 'font-weight', 'font-size', 'text-decoration', 'font-variant', 'color',
-    'width', 'text-align', 'margin-left'
+    'font-family', 'font-weight', 'font-size', 'text-decoration',
+    'font-variant', 'color', 'width', 'text-align', 'margin-left'
 ]
 BLEACH_STRIP_TAGS = True
 BLEACH_DEFAULT_WIDGET = 'ckeditor.widgets.CKEditorWidget'
@@ -174,3 +177,9 @@ BLEACH_DEFAULT_WIDGET = 'ckeditor.widgets.CKEditorWidget'
 CURRENCIES = ('USD',)
 BASE_CURRENCY = 'USD'
 _FORMATTER.add_sign_definition('default', moneyed.USD, prefix='$', suffix='')
+
+# Crispy forms
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# Honeypot
+HONEYPOT_FIELD_NAME = 'phonenumber'

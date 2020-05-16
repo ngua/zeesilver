@@ -4,8 +4,15 @@ from .models import Category, Listing, Material
 
 @admin.register(Listing)
 class ListingAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'sold', 'price')
+    list_display = ('name', 'category', 'sold', 'price', 'display_materials')
     list_filter = ('category', 'sold', 'materials')
+
+    def display_materials(self, obj):
+        return ', '.join([
+            str(material) for material in obj.materials.all()
+        ])
+
+    display_materials.short_description = 'Materials'
 
     class Meta:
         ordering = ('-created',)

@@ -10,8 +10,9 @@
   <div class="col-lg-10 col-sm-12">
     {% if object_list %}
     {% legend "Results for '"|add:q|add:"'" %}
+    <small class="text-muted">{{ total }} result{% if total > 1 %}s{% endif %} found</small>
     {% endif %}
-    <div id="results" class="row p-2">
+    <div id="results" class="row p-2 justify-content-center">
       {% for listing in page_obj %}
       <div class="col-lg-6 col-sm-12 py-3 border-bottom">
         <div class="row justify-content-center">
@@ -38,7 +39,7 @@
       </div>
       {% empty %}
       <div class="col-12">
-        {% empty_qs heading="No results found!" lead="We couldn't find and matching results for "|add:q text="Please try a different search." %}
+        {% jumbotron heading="No results found!" lead="We couldn't find and matching results for "|add:q text="Please try a different search." %}
       </div>
     </div>
     {% endfor %}

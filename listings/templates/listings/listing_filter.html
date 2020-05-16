@@ -1,37 +1,41 @@
 {% extends "listings/base.html" %}
-{% load bleach_tags zeesilver_extras %}
+{% load static bleach_tags zeesilver_extras %}
 {% block breadcrumb %}
 {{ block.super }}
 <li class="active">Gallery</li>
 {% endblock %}
 {% block content %}
 <div id="top" class="row justify-content-center">
-  <div class="col-lg-3 col-sm-12">
+  <div class="col-xl-3 col-lg-4 col-sm-12">
     <div class="row">
       <aside class="col-12 p-3 px-0">
         {% filter_options 'categories' option='categories' %}
         {% filter_options 'by price' option='prices' %}
-        <div class="pb-3">
-          <a href="{% url 'listing-filter' %}" class="btn btn-secondary d-inline mx-3">
-            Clear All
-            <span class="fas fa-times-circle"></span>
-          </a>
-          <a
-            href="
-            {% if current_order == 'price' %}
-            {% filter_href current_category current_price "-price" page_obj.number %}
-            {% else %}
-            {% filter_href current_category current_price "price" page_obj.number %}
-            {% endif %}"
-            class="btn btn-secondary mx-auto d-inline">
-            Price
-            <div class="d-inline mx-3 sort">
-              {% with '#ffd90c' as yellow %}
-              <span class="fas fa-sort-up" style="{% if current_order == 'price' %}color: {{ yellow }};{% endif %}"></span>
-              <span class="fas fa-sort-down" style="{% if current_order == '-price' %}color: {{ yellow }};{% endif %}"></span>
-              {% endwith %}
-            </div>
-          </a>
+        <div class="pb-3 justify-content-center">
+          <div class="mx-3 mx-sm-0 d-sm-inline">
+            <a href="{% url 'listing-filter' %}" class="btn btn-secondary d-inline m-3">
+              Clear All
+              <span class="fas fa-times-circle"></span>
+            </a>
+          </div>
+          <div class="mx-3 mx-sm-0 d-sm-inline">
+            <a
+              href="
+              {% if current_order == 'price' %}
+              {% filter_href current_category current_price "-price" page_obj.number %}
+              {% else %}
+              {% filter_href current_category current_price "price" page_obj.number %}
+              {% endif %}"
+              class="btn btn-secondary m-3 m-lg-0">
+              Price
+              <div class="d-inline mx-3 sort">
+                {% with '#ffd90c' as yellow %}
+                <span class="fas fa-sort-up" style="{% if current_order == 'price' %}color: {{ yellow }};{% endif %}"></span>
+                <span class="fas fa-sort-down" style="{% if current_order == '-price' %}color: {{ yellow }};{% endif %}"></span>
+                {% endwith %}
+              </div>
+            </a>
+          </div>
         </div>
       </aside>
     </div>
@@ -59,7 +63,7 @@
       </div>
       {% empty %}
       <div class="col-12">
-        {% empty_qs heading="We're sold out!" lead="Looks like we're all sold out." text="Come back soon to see more of Zee's original creations!" %}
+        {% jumbotron heading="We're sold out!" lead="Looks like we're all sold out." text="Come back soon to see more of Zee's original creations!" %}
       </div>
       {% endfor %}
     </div>
@@ -106,13 +110,5 @@
 </div>
 {% endblock %}
 {% block body_js %}
-<script>
-  const togglers = document.querySelectorAll('.toggler');
-  Array.prototype.map.call(togglers, (toggler => {
-    const icon = toggler.querySelector('.fas')
-    toggler.addEventListener('click', () => {
-      icon.classList.replace('fa-plus', 'fa-minus') || icon.classList.replace('fa-minus', 'fa-plus');
-    });
-  }));
-</script>
+<script src="{% static 'js/listings.js' %}"> </script>
 {% endblock %}

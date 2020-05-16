@@ -3,35 +3,33 @@
   <h3 class="p-3 d-inline">{{ heading|title }}</h3>
   <i style="color: white;" class="fas fa-minus d-inline float-right p-3"></i>
 </div>
-<div>
-  <hr>
-  <div id="{{ heading|slugify }}" class="collapse show">
-    <nav class="navbar navbar-expand navbar-dark bg-dark p-4 flex-md-column align-items-start m-4">
-      <div>
-        <ul class="flex-column navbar-nav w-100 justify-content-between">
-          {% if option == 'categories' %}
-          {% for category in categories %}
-          <li class="nav-item">
-            <a
-              class="nav-link p-2{% if category.name == current_category %} current{% endif %}"
-              href="{% filter_href category.name current_price current_order page_obj.number %}">
-               {{ category.name }}
-            </a>
-          </li>
-          {% endfor %}
-          {% else %}
-          {% for price in prices %}
-          <li class="nav-item">
-            <a
-              class="nav-link p-2{% if price.amount == current_price %} current{% endif %}"
-              href="{% filter_href current_category price.amount current_order page_obj.number %}">
-               {{ price }} <small class="text-muted">and under</small>
-            </a>
-          </li>
-          {% endfor %}
-          {% endif %}
-        </ul>
-      </div>
-    </nav>
-  </div>
+<hr>
+<div id="{{ heading|slugify }}" class="collapse show">
+  <nav class="navbar navbar-expand navbar-dark bg-dark p-4 flex-md-column align-items-start m-4">
+    <div>
+      <ul class="flex-column navbar-nav w-100 justify-content-between">
+        {% if option == 'categories' %}
+        {% for category in categories %}
+        <li class="nav-item">
+          <a
+            class="nav-link p-2{% if category.name == current_category %} current{% endif %}"
+            href="{% filter_href category.name current_price current_order page_obj.number %}">
+            {{ category.name }}
+          </a>
+        </li>
+        {% endfor %}
+        {% else %}
+        {% for price in prices %}
+        <li class="nav-item">
+          <a
+            class="nav-link p-2{% if price.amount == current_price %} current{% endif %}"
+            href="{% filter_href current_category price.amount current_order page_obj.number %}">
+            {{ price }} <small class="text-muted">and under</small>
+          </a>
+        </li>
+        {% endfor %}
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
 </div>
