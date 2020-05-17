@@ -3,7 +3,7 @@
 {% block title %}Home{% endblock %}
 {% block carousel %}
 <div class="container-fluid p-0 w-100">
-  <div id="carousel" class="carousel carousel-fade" data-ride="carousel" data-interval="50000">
+  <div id="carousel" class="carousel carousel-fade" data-ride="carousel" data-interval="5000">
     <ol class="carousel-indicators">
       {% for item in carousel %}
       <li data-target="#carousel" data-slide-to="{{ forloop.counter0 }}" class="{% if forloop.counter == 1%} active {% endif %}"></li>

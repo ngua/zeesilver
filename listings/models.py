@@ -72,15 +72,18 @@ class ListingQuerySet(models.QuerySet):
 
 
 class ListingManager(models.Manager.from_queryset(ListingQuerySet)):
-    def get_queryset(self):
+    def generate_summary(self):
         """
         Creates a field for aggregating all text fields into a single
         searchable value. Postgres' SearchVector cannot include joined
         fields since it uses Django's F expression, so this step is
         necessary to search Listing through the Category and Material `name`
-        attributes in the Listing SearchVectorField
+        attributes in the Listing SearchVectorField.
+        Since this is a rather computationally intensive task, it shouldn't
+        be called in the ListingManager `get_queryset` method directly,
+        otherwise it will affect all Listing db calls
         """
-        return super().get_queryset().annotate(
+        return self.get_queryset().annotate(
             summary=Concat(
                 'name', V(' '),
                 'description', V(' '),
@@ -104,7 +107,7 @@ class ListingManager(models.Manager.from_queryset(ListingQuerySet)):
                 'materials__name', delimiter=' '
             ), weight='A')
         )
-        return self.get_queryset().annotate(summary=vector)
+        return self.generate_summary().annotate(summary=vector)
 
     def unsold(self):
         return self.get_queryset().unsold()
@@ -159,7 +162,7 @@ class Listing(models.Model):
             from .tasks import update_search_task
             # 'on_commit' necessary to avoid race condition between
             # Django and Celery when accessing model instance
-            # REMEMBER TransactionTestCase is needed for tests
+            # NOTE Remember that TransactionTestCase is needed for tests
             transaction.on_commit(
                 lambda: update_search_task.delay(self.pk)
             )
@@ -171,7 +174,7 @@ class Listing(models.Model):
         """
         return Listing.objects.exclude(id=self.id).filter(
             category=self.category
-        ).unsold()[:limit+1]
+        ).select_related('category').defer('search_vector').unsold()[:limit+1]
 
     def __repr__(self):
         return f"Listing('{self.name}', '{self.category}')"

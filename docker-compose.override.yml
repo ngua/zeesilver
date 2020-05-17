@@ -15,15 +15,14 @@ services:
   celery:
     volumes:
       - ./:/app
-      - celery_data:/app/var/run/celery/
+      - celery_data:/var/run/celery/
     command: >
       celery -A zeesilver worker
       -E
       -l info
-      --pidfile=/app/var/run/celery/celeryworker.pid
+      --pidfile=/var/run/celery/celeryworker.pid
     env_file:
       - ./.env.dev
-    entrypoint: /app/wait-for-db.sh
 
   db:
     image: postgres:12.2

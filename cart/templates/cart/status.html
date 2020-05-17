@@ -1,0 +1,58 @@
+{% extends "common/base.html" %}
+{% load zeesilver_extras %}
+{% block title %}Cart{% endblock %}
+{% block breadcrumb %}
+<li><a href="{% url 'index' %}">Home</a></li>
+<li class="active">Cart</li>
+{% endblock %}
+{% block content %}
+<div id="cart" class="row mt-4 justify-content-center">
+  {% for item in cart %}
+  <div class="col-lg-4 col-sm-12 m-2 border">
+    <div class="row justify-content-center">
+      <div class="col-lg-3 col-sm-12">
+        <div class="float-lg-right">
+          <img src="{{ item.picture.url }}" alt="">
+        </div>
+      </div>
+      <div class="col-lg-3 col-sm-12 align-self-center">
+        <div class="float-lg-left">
+          <h3>
+            {{ item.name }}
+          </h3>
+          <h4>
+            {{ item.price }}
+          </h4>
+          <form id="clear" method="POST" action="{% url 'cart-remove' %}">{% csrf_token %}
+            <input type="hidden" id="listing" name="listing" value="{{ item.slug }}">
+            <button type="submit" class="cart-button">
+              <span
+                class="fas fa-trash"
+                style="color: indianred;"
+                data-toggle="tooltip"
+                data-placement="bottom"
+                title="Remove from cart">
+              </span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    {% jumbotron "Nothing to see here!" "There are no items in your cart" %}
+  </div>
+  {% endfor %}
+  {% if cart.items %}
+  <div class="col-12 text-center mt-4 border-top">
+    <h4><span class="font-weight-bold">Total</span>: {{ cart.total }}</h4>
+  </div>
+  <div>
+    <form id="clear" method="POST" action="{% url 'cart-clear' %}">{% csrf_token %}
+      <button class="btn btn-danger font-weight-bold" type="submit">Clear Cart</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

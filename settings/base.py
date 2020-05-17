@@ -34,9 +34,10 @@ INSTALLED_APPS = [
     'honeypot',
     'common',
     'search',
+    'cart',
     # Application config class necessary for Celery to discover tasks
-    'listings.apps.ListingsConfig',
     'contact.apps.ContactConfig',
+    'listings.apps.ListingsConfig',
 ]
 
 MIDDLEWARE = [
@@ -64,6 +65,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'common.context_processors.price_points',
                 'common.context_processors.in_stock',
+                'search.context_processors.search_form',
+                'cart.context_processors.cart',
             ],
         },
     },
@@ -160,6 +163,7 @@ CELERY_RESULT_BACKEND = REDIS_URI
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+CELERY_IMPORTS = ('listings.tasks', 'contact.tasks')
 
 # Ckeditor settings
 
@@ -212,3 +216,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Honeypot
 HONEYPOT_FIELD_NAME = 'phonenumber'
+
+# Session cart settings
+
+CART_KEY = 'CART'

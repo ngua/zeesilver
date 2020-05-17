@@ -20,9 +20,9 @@ COPY ./wait-for-db.sh /app/wait-for-db.sh
 COPY ./entrypoint.sh /app/entrypoint.sh
 COPY . /app
 
-RUN mkdir -p /app/var/run/celery/
-RUN touch /app/var/run/celery/celeryworker.pid
+RUN mkdir -p /var/run/celery/
 RUN chown -R $USERNAME:$USERNAME /app
+RUN chown -R $USERNAME:$USERNAME /var/run/celery
 
 USER $USERNAME
 

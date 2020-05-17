@@ -7,7 +7,7 @@ from .filters import ListingFilter
 
 class ListingFilterView(FilterView):
     filterset_class = ListingFilter
-    queryset = Listing.objects.unsold()
+    queryset = Listing.objects.unsold().defer('search_vector')
     paginate_by = 6
 
     def get_context_data(self, *args, **kwargs):
@@ -42,7 +42,10 @@ class ListingDetailView(DetailView):
         sold can no longer be accessed. Each inventory item is unique,
         so it's best if the DetailView only shows unsold items
         """
-        obj = super().get_object()
+        obj = Listing.objects.filter(
+            slug=self.kwargs['slug']
+        ).prefetch_related('category').defer('search_vector').first()
+
         if obj.sold:
             raise Http404
         return obj

@@ -28,9 +28,9 @@
               <a class="nav-item nav-link my-1" href="{% url 'contact' %}">Contact</a>
             </div>
             <div class="navbar-nav ml-auto">
-              <div class="search-wrappper">
-                <form id="search" class="" action="{% url 'search' %}" method="GET">
-                  <input type="search" name="q" placeholder="Search...">
+              <div>
+                <form id="search" class="" action="{% url 'search' %}" method="GET" novalidate>
+                  {{ search_form.q }}
                   <i class="fas fa-search  my-2"></i>
                 </form>
               </div>
