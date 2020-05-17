@@ -12,6 +12,19 @@ services:
     depends_on:
       - db
 
+  celery:
+    volumes:
+      - ./:/app
+      - celery_data:/app/var/run/celery/
+    command: >
+      celery -A zeesilver worker
+      -E
+      -l info
+      --pidfile=/app/var/run/celery/celeryworker.pid
+    env_file:
+      - ./.env.dev
+    entrypoint: /app/wait-for-db.sh
+
   db:
     image: postgres:12.2
     volumes:
@@ -24,3 +37,4 @@ services:
 volumes:
   app:
   postgres_data:
+  celery_data:

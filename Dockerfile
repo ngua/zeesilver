@@ -16,9 +16,12 @@ ENV USERNAME=app
 ENV UID=1000
 RUN addgroup --system --gid $UID $USERNAME && adduser --disabled-password --gecos '' --system --gid $UID --uid $UID $USERNAME
 
+COPY ./wait-for-db.sh /app/wait-for-db.sh
 COPY ./entrypoint.sh /app/entrypoint.sh
 COPY . /app
 
+RUN mkdir -p /app/var/run/celery/
+RUN touch /app/var/run/celery/celeryworker.pid
 RUN chown -R $USERNAME:$USERNAME /app
 
 USER $USERNAME

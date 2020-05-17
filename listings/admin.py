@@ -8,6 +8,9 @@ class ListingAdmin(admin.ModelAdmin):
     list_filter = ('category', 'sold', 'materials')
 
     def display_materials(self, obj):
+        """
+        `list_display` can't display m2m relations
+        """
         return ', '.join([
             str(material) for material in obj.materials.all()
         ])

@@ -33,9 +33,10 @@ INSTALLED_APPS = [
     'crispy_forms',
     'honeypot',
     'common',
-    'listings',
     'search',
-    'contact'
+    # Application config class necessary for Celery to discover tasks
+    'listings.apps.ListingsConfig',
+    'contact.apps.ContactConfig',
 ]
 
 MIDDLEWARE = [
@@ -131,6 +132,34 @@ STATICFILES_FINDERS = (
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LISTING_MEDIA = 'listings'
+
+# Messages settings
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+# Redis for caching, celery taskbroker
+REDIS_URI = os.environ.get('REDIS_URI')
+
+# Cache
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_URI,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+
+# Celery settings
+
+CELERY_BROKER_URL = REDIS_URI
+CELERY_RESULT_BACKEND = REDIS_URI
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 # Ckeditor settings
 

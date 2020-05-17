@@ -14,3 +14,9 @@ class ContactCreateView(SuccessMessageMixin, CreateView):
         'Thanks for reaching out, %(name)s! '
         "We'll get back to you soon."
     )
+
+    def form_valid(self, form):
+        form.save()
+        form.send_admin_notification()
+        response = super().form_valid(form)
+        return response

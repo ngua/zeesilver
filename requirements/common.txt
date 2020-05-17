@@ -10,3 +10,5 @@ django-money==1.1
 django-filter==2.2.0
 django-crispy-forms==1.9.1
 django-honeypot==0.8.0
+django-redis==4.11.0
+celery==4.4.2

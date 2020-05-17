@@ -4,3 +4,15 @@ services:
   web:
     build: .
     image: zeesilver
+
+  celery:
+    image: zeesilver
+    depends_on:
+      - web
+
+  redis:
+    image: redis:5.0-alpine
+    user: "1001"
+    ports:
+      - "6382:6382"
+    command: ["redis-server", "--port", "6382"]

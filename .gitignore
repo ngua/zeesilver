@@ -2,6 +2,7 @@ __pycache__/
 *.py[cod]
 .env*
 .vim/
+wait-for-db.sh
 test_data*
 static/styles/css/*
 static/src/node_modules

@@ -15,10 +15,11 @@ class SearchListView(ListView):
 
         if q:
             query = SearchQuery(q)
-            qs = qs.annotate(
-                rank=SearchRank(
+            qs = qs.annotate(rank=SearchRank(
                     F('search_vector'), query
                 )).filter(search_vector=query).order_by('-rank')
+        else:
+            qs = qs.none()
 
         self.q = q
         self.total = len(qs)
@@ -26,9 +27,12 @@ class SearchListView(ListView):
         return qs
 
     def get_context_data(self, **kwargs):
+        """
+        Captures some additional variables for display in the template
+        """
         context = super().get_context_data(**kwargs)
         context.update({
-            'q': self.q,
+            'q': f'"{self.q}"',
             'total': self.total
         })
         return context

@@ -4,6 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.text import slugify
 from django.db.models import signals, TextField, Value as V
+from django.db import transaction
 from django.db.models.functions import Concat
 from django.dispatch import receiver
 from django.contrib.postgres.indexes import GinIndex
@@ -19,9 +20,7 @@ class CategoryQuerySet(models.QuerySet):
         Returns all Category instances with at least one unsold related
         Listing object
         """
-        return self.filter(
-            listing__isnull=False
-        ).filter(listing__sold=False).distinct()
+        return self.filter(listing__sold=False).distinct()
 
 
 class CategoryManager(models.Manager):
@@ -148,18 +147,22 @@ class Listing(models.Model):
         Overrides `save` in order to:
         1. Generate a slug once, ensuring that name changes do not
         affect existing slug, otherwise existing URLs might 404
-        2. Update the instance's `search_vector` by aggregating
-        newly saved data, updating the field, and then re-saving,
-        the instance, making sure that `save` is not being called
+        2. Call a celery tasks to update the instance's `search_vector`
+        by aggregating newly saved data, updating the field, and then re-
+        saving, the instance, making sure that `save` is not being called
         specifically to update the search vector
-        TODO Update vector asynchronously (celery task?)
         """
         if not self.id:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
         if 'search_vector' not in kwargs.get('update_fields', {}):
-            instance = Listing.objects.query_summary().get(pk=self.pk)
-            instance.update_vector()
+            from .tasks import update_search_task
+            # 'on_commit' necessary to avoid race condition between
+            # Django and Celery when accessing model instance
+            # REMEMBER TransactionTestCase is needed for tests
+            transaction.on_commit(
+                lambda: update_search_task.delay(self.pk)
+            )
 
     def get_related(self, limit=10):
         """
@@ -169,15 +172,6 @@ class Listing(models.Model):
         return Listing.objects.exclude(id=self.id).filter(
             category=self.category
         ).unsold()[:limit+1]
-
-    def update_vector(self):
-        """
-        Calls the ListingManager `query_summary` method to
-        update the `summary` aggregate value and update the
-        search vector
-        """
-        self.search_vector = self.summary
-        self.save(update_fields=['search_vector'])
 
     def __repr__(self):
         return f"Listing('{self.name}', '{self.category}')"
