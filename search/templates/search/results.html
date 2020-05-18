@@ -9,8 +9,10 @@
 <div id="results" class="row justify-content-center">
   <div class="col-lg-10 col-sm-12">
     {% if object_list %}
-    {% legend "Results for "|add:q %}
-    <small class="text-muted">{{ total }} result{% if total > 1 %}s{% endif %} found</small>
+    {% with q|quote as query %}
+    {% legend "Results for "|add:query %}
+    {% endwith %}
+    <small class="text-muted">{{ total }} result{{ total|pluralize }} found</small>
     {% endif %}
     <div id="results" class="row p-2 justify-content-center">
       {% for listing in page_obj %}
@@ -44,15 +46,14 @@
     </div>
     {% endfor %}
   </div>
-  <div class="row justify-content-center">
+  <div class="row justify-content-center mt-3">
     <div class="col-lg-6 col-sm-12 pt-4 mx-auto text-center">
-      <hr>
       {% if is_paginated %}
       <ul id="pagination">
         {% if page_obj.has_previous %}
-        <li><a class="btn btn-sm btn-outline-secondary" href="?page={{ 1 }}">First</a></li>
+        <li><a class="btn btn-sm btn-secondary" href="{% search_pagination_href q %}">First</a></li>
         <li>
-          <a href="?page={{ page_obj.previous_page_number }}">
+          <a href="{% search_pagination_href q page_obj.previous_page_number %}">
             <span class="prev"></span>
           </a>
         </li>
@@ -62,7 +63,7 @@
         {% if page_obj.number == n %}
         <li class=""><span class="btn btn-sm btn-outline-secondary">{{ page_obj.number }}</span></li>
         {% elif n > page_obj.number|add:'-3' and n < page_obj.number|add:'3' %}
-        <li><a class="btn btn-sm btn-secondary" href="?page={{ n }}">{{ n }}</a></li>
+        <li><a class="btn btn-sm btn-secondary" href="{% search_pagination_href q n %}">{{ n }}</a></li>
         {% else %}
         ...
         {% endif %}
@@ -70,11 +71,11 @@
 
         {% if page_obj.has_next %}
         <li>
-          <a href="?page={{ page_obj.next_page_number }}">
+          <a href="{% search_pagination_href q page_obj.next_page_number %}">
             <span class="next"></span>
           </a>
         </li>
-        <li><a class="btn btn-sm btn-outline-secondary" href="?page={{ page_obj.num_pages }}">Last</a></li>
+        <li><a class="btn btn-sm btn-secondary" href="{% search_pagination_href q page_obj.paginator.num_pages %}">Last</a></li>
         {% endif %}
       </ul>
       {% endif %}

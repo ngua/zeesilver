@@ -12,12 +12,3 @@ class SearchForm(forms.Form):
                 'placeholder': 'Search...'
             }
         ))
-
-    def clean(self):
-        cleaned_data = super().clean()
-        q = cleaned_data.get('q')
-
-        if not q:
-            raise forms.ValidationError(
-                'No value'
-            )

@@ -39,9 +39,14 @@ def filter_options(context, heading, **kwargs):
 @register.simple_tag
 def filter_href(category, price, order, page):
     return (
-        f"?category={category}&price__lte={price}"
-        f"&order_by={order}&page={page}"
+        f'?category={category}&price__lte={price}'
+        f'&order_by={order}&page={page}'
     )
+
+
+@register.simple_tag
+def search_pagination_href(q, page=1):
+    return f'?q={q}&page={page}'
 
 
 @register.inclusion_tag('common/tags/jumbotron.html')
@@ -51,3 +56,8 @@ def jumbotron(heading, lead, text=''):
         'lead': lead,
         'text': text
     }
+
+
+@register.filter
+def quote(value):
+    return f'"{value}"'

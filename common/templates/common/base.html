@@ -31,8 +31,23 @@
               <div>
                 <form id="search" class="" action="{% url 'search' %}" method="GET" novalidate>
                   {{ search_form.q }}
-                  <i class="fas fa-search  my-2"></i>
+                  <i class="fas fa-search my-md-4"></i>
                 </form>
+              </div>
+              <div id="cart-status">
+                <a class="nav-item" href="{% url 'cart' %}">
+                  <i
+                    class="fas fa-shopping-cart fa-lg my-lg-4 mx-md-4 my-sm-3 {% if not cart.is_empty %}dot{% endif %}"
+                    data-toggle="tooltip"
+                    data-placement="bottom"
+                    {% if cart.is_empty %}
+                    title="Your cart is empty!"
+                    {% else %}
+                    title="You have {{ cart.count }} item{{ cart.count|pluralize }} in your cart"
+                    {% endif %}
+                    >
+                  </i>
+                </a>
               </div>
             </div>
           </div>
@@ -66,9 +81,6 @@
         </div>
         {% block content %}{% endblock %}
       </main>
-      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap.native@2.0.15/dist/bootstrap-native-v4.min.js"></script>
-      <script src="{% static 'js/search.js' %}"></script>
-      {% block body_js %}{% endblock body_js %}
       <hr class="mt-4">
       <footer id="footer" class="footer text-center bg-dark">
         <div class="container-fluid">
@@ -77,10 +89,18 @@
               <small class="text-muted">&copy; 2019 - {% now 'Y' %} Zee </small>
             </div>
             <div class="col">
-              <a href="{% url 'index' %}"><span class="fas fa-home fa-sm mx-1" style="color: gray;"></span></a>
-              <a href="{% url 'listing-filter' %}"><span class="fas fa-ring fa-sm mx-1" style="color: gray;"></span></a>
-              <a href="{% url 'contact' %}"><span class="far fa-address-book fa-sm mx-1" style="color: gray;"></span></a>
-              <a href=""><span class="fas fa-info-circle fa-sm mx-1" style="color: gray;"></span></a>
+              <a href="{% url 'index' %}" data-toggle="tooltip" title="Home">
+                <span class="fas fa-home fa-sm mx-1" style="color: gray;"></span>
+              </a>
+              <a href="{% url 'listing-filter' %}" data-toggle="tooltip" title="Gallery">
+                <span class="fas fa-ring fa-sm mx-1" style="color: gray;"></span>
+              </a>
+              <a href="{% url 'contact' %}" data-toggle="tooltip" title="Contact">
+                <span class="far fa-address-book fa-sm mx-1" style="color: gray;"></span>
+              </a>
+              <a href="" data-toggle="tooltip" title="About">
+                <span class="fas fa-info-circle fa-sm mx-1" style="color: gray;"></span>
+              </a>
             </div>
             <div class="col">
               <a href=""><i class="fab fa-whatsapp-square" style="color: #6c757d;"></i></a>
@@ -89,6 +109,9 @@
           </div>
         </div>
       </footer>
+      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap.native@2.0.15/dist/bootstrap-native-v4.min.js"></script>
+      <script src="{% static 'js/search.js' %}"></script>
+      {% block body_js %}{% endblock body_js %}
     </div>
   </body>
 </html>

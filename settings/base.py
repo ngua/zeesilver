@@ -34,10 +34,10 @@ INSTALLED_APPS = [
     'honeypot',
     'common',
     'search',
-    'cart',
     # Application config class necessary for Celery to discover tasks
     'contact.apps.ContactConfig',
     'listings.apps.ListingsConfig',
+    'cart.apps.CartConfig'
 ]
 
 MIDDLEWARE = [
@@ -48,6 +48,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'cart.middleware.CartTimeoutMiddleware',
 ]
 
 ROOT_URLCONF = 'zeesilver.urls'
@@ -65,6 +66,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'common.context_processors.price_points',
                 'common.context_processors.in_stock',
+                'common.context_processors.carousel',
                 'search.context_processors.search_form',
                 'cart.context_processors.cart',
             ],
@@ -155,6 +157,10 @@ CACHES = {
     }
 }
 
+# Session settings
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+
 
 # Celery settings
 
@@ -220,3 +226,6 @@ HONEYPOT_FIELD_NAME = 'phonenumber'
 # Session cart settings
 
 CART_KEY = 'CART'
+# Expiry time, in seconds, before cart items are removed and returned to stock
+CART_TIMEOUT = 3600
+CART_TIMEOUT_KEY = 'CART_TIMEOUT'

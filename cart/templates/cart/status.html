@@ -23,6 +23,9 @@
           <h4>
             {{ item.price }}
           </h4>
+          <h5>
+            {{ item.pieces }} piece{{ item.pieces|pluralize }}
+          </h5>
           <form id="clear" method="POST" action="{% url 'cart-remove' %}">{% csrf_token %}
             <input type="hidden" id="listing" name="listing" value="{{ item.slug }}">
             <button type="submit" class="cart-button">
@@ -50,8 +53,11 @@
   </div>
   <div>
     <form id="clear" method="POST" action="{% url 'cart-clear' %}">{% csrf_token %}
-      <button class="btn btn-danger font-weight-bold" type="submit">Clear Cart</button>
+      <button class="btn btn-danger mx-2 font-weight-bold" type="submit">Clear Cart</button>
     </form>
+  </div>
+  <div>
+    <a class="btn btn-secondary mx-2 text-light font-weight-bold">Checkout</a>
   </div>
   {% endif %}
 </div>

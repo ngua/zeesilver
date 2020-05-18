@@ -164,6 +164,12 @@ ul.crumb {
   @include lg {
     padding-bottom: 40px;
   }
+
+  a {
+    &:hover {
+      text-decoration: none;
+    }
+  }
 }
 
 .prices {
@@ -183,6 +189,10 @@ ul.crumb {
         font-family: $monserrat;
         font-weight: bold;
         color: $dark-grey;
+      }
+
+      h3 {
+        font-family: $beth-ellen;
       }
     }
   }

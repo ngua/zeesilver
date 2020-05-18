@@ -12,3 +12,34 @@
     width: auto;
   }
 }
+
+#cart-status {
+  display: inline-block;
+  margin-top: 8px;
+
+  @include lg {
+    margin-top: 0;
+  }
+
+  a {
+    position: relative;
+
+    i.dot {
+      &:after {
+        position: absolute;
+        top: -8px;
+        content: "";
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        background: $red;
+        border: 1px solid $brick-red;
+
+        @include lg {
+          right: 20px;
+        }
+      }
+    }
+  }
+}

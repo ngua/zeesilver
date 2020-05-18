@@ -32,7 +32,7 @@ class SearchListView(ListView):
         """
         context = super().get_context_data(**kwargs)
         context.update({
-            'q': f'"{self.q}"',
+            'q': self.q,
             'total': self.total
         })
         return context
