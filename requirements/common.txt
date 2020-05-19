@@ -12,3 +12,5 @@ django-crispy-forms==1.9.1
 django-honeypot==0.8.0
 django-redis==4.11.0
 celery==4.4.2
+requests==2.23.0
+geoip2==3.0.0

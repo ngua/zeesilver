@@ -34,10 +34,10 @@ INSTALLED_APPS = [
     'honeypot',
     'common',
     'search',
+    'cart',
     # Application config class necessary for Celery to discover tasks
     'contact.apps.ContactConfig',
-    'listings.apps.ListingsConfig',
-    'cart.apps.CartConfig'
+    'listings.apps.ListingsConfig'
 ]
 
 MIDDLEWARE = [

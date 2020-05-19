@@ -7,14 +7,14 @@ class ListingUnavailable(Exception):
 
 
 class Cart:
-    # To retrieve an existing session cart, if any
+    # Used to retrieve an existing session cart, if any
     KEY = getattr(settings, 'CART_KEY', 'CART')
 
     def __init__(self, session):
         self._session = session  # Django request._session object
         self._items = {}  # Maps Listing pks to their prices
         if self.KEY in self._session:
-            # If the KEY is already in the session, the cart exists and
+            # If the key is already in the session, the cart exists and
             # must be rebuilt from the serialized items stored as its value
             pks = self._session[self.KEY]
             self._rebuild_cart(pks)
@@ -132,6 +132,7 @@ class Cart:
         """
         Produces a list of Listing instance pks. This will be stored as a
         representation of the cart in the session in order to rebuild the cart
-        on subsequent requests
+        on subsequent requests. Can't use the `items` attribute directly,
+        since dict keys can't be pickled
         """
         return [item for item in self._items]

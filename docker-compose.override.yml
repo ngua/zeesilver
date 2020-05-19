@@ -23,6 +23,20 @@ services:
       --pidfile=/var/run/celery/celeryworker.pid
     env_file:
       - ./.env.dev
+    entrypoint: /app/wait-for-db.sh
+
+  celery-beat:
+    volumes:
+      - ./:/app
+      - celery_data:/var/run/celery/
+    command: >
+      celery -A zeesilver beat
+      -l info
+      --schedule=/var/run/celery/celerybeat-schedule
+      --pidfile=/var/run/celery/celerybeat.pid
+    env_file:
+      - ./.env.dev
+    entrypoint: /app/wait-for-db.sh
 
   db:
     image: postgres:12.2

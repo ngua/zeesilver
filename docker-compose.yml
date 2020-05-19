@@ -10,6 +10,11 @@ services:
     depends_on:
       - web
 
+  celery-beat:
+    image: zeesilver
+    depends_on:
+      - web
+
   redis:
     image: redis:5.0-alpine
     user: "1001"

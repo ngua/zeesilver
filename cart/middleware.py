@@ -24,6 +24,9 @@ class CartTimeoutMiddleware:
         Instantiate the cart using the session and check check the epoch
         timestamp, clearing the cart and redirecting if expired, otherwise
         refreshing the timestamp
+
+        NOTE Since the session is modified directly, this also has the side
+        effect of resetting the session cookie expiry
         """
         response = self.get_response(request)
         timestamp = request.session.setdefault(self.KEY, time.time())
@@ -37,5 +40,6 @@ class CartTimeoutMiddleware:
                     request,
                     'Your cart was automatically cleared due to inactivity'
                 )
+
         request.session[self.KEY] = time.time()
         return response
