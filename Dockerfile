@@ -21,8 +21,10 @@ COPY ./entrypoint.sh /app/entrypoint.sh
 COPY . /app
 
 RUN mkdir -p /var/run/celery/
-RUN chown -R $USERNAME:$USERNAME /app
+RUN mkdir /geoip2
 RUN chown -R $USERNAME:$USERNAME /var/run/celery
+RUN chown -R $USERNAME:$USERNAME /geoip2
+RUN chown -R $USERNAME:$USERNAME /app
 
 USER $USERNAME
 

@@ -229,3 +229,15 @@ CART_KEY = 'CART'
 # Expiry time, in seconds, before cart items are removed and returned to stock
 CART_TIMEOUT = 3600
 CART_TIMEOUT_KEY = 'CART_TIMEOUT'
+
+# Geoip settings
+
+GEOIP_PATH = os.environ.get('GEOIP_PATH')
+GEOIP_COUNTRY = os.environ.get('GEOIP_COUNTRY')
+GEOIP_CITY = os.environ.get('GEOIP_CITY')
+
+GEODB_DOMAIN = os.environ.get('GEODB_DOMAIN')
+GEODB_COUNTRY = os.environ.get('GEODB_COUNTRY')
+GEODB_CITY = os.environ.get('GEODB_CITY')
+GEODB_COUNTRY_PERMALINK = f'{GEODB_DOMAIN}/{GEODB_COUNTRY}'
+GEODB_CITY_PERMALINK = f'{GEODB_DOMAIN}/{GEODB_CITY}'

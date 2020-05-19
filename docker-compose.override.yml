@@ -4,6 +4,7 @@ services:
   web:
     volumes:
       - ./:/app
+      - geoip2:/geoip2
     command: python manage.py runserver 0.0.0.0:8000 --settings=settings.dev
     ports:
       - 8000:8000
@@ -51,3 +52,4 @@ volumes:
   app:
   postgres_data:
   celery_data:
+  geoip2:
