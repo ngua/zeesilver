@@ -10,30 +10,31 @@ class Command(BaseCommand):
     """
     Management command to fetch and extract GeoIP2 databases in tar.gz format
     from URL specified in settings
+    Intended primarily to be run as monthly celerybeat task
     """
     help = 'Downloads and extracts most recent GeoIP2 database archives'
 
-    GEOIP_PATH = getattr(settings, 'GEOIP_PATH', '/geoip2')
-    GEOIP_COUNTRY = getattr(settings, 'GEOIP_COUNTRY', 'country.mmdb')
-    GEOIP_CITY = getattr(settings, 'GEOIP_CITY', 'city.mmdb')
-
-    DATABASES = {
-        GEOIP_COUNTRY: getattr(settings, 'GEODB_COUNTRY_PERMALINK'),
-        GEOIP_CITY: getattr(settings, 'GEODB_CITY_PERMALINK'),
-    }
+    def __init__(self):
+        self.geoip_path = getattr(settings, 'GEOIP_PATH', '/geoip2')
+        self.geoip_country = getattr(settings, 'GEOIP_COUNTRY', 'country.mmdb')
+        self.geoip_city = getattr(settings, 'GEOIP_CITY', 'city.mmdb')
+        self.databases = {
+            self.geoip_country: getattr(settings, 'GEODB_COUNTRY_PERMALINK'),
+            self.geoip_city: getattr(settings, 'GEODB_CITY_PERMALINK'),
+        }
 
     def handle(self, *args, **kwargs):
         # Ensure that URLs are defined in settings module
-        if any(url is None for url in self.DATABASES.values()):
+        if any(url is None for url in self.databases.values()):
             raise CommandError(
                 'Please configure GeoIP URLs in settings module'
             )
 
         # Use custom context manager to cd into db path specified in
         # settings. This is somewhat easier than calling os.path.join
-        # repeatedly to ensure the correct path
-        with cd(self.GEOIP_PATH):
-            for db_name, url in self.DATABASES.items():
+        # to ensure the correct path
+        with cd(self.geoip_path):
+            for db_name, url in self.databases.items():
                 self.fetch_archives(db_name, url)
 
     def fetch_archives(self, db_name, url):
@@ -59,7 +60,7 @@ class Command(BaseCommand):
         the archive and matching against the correct file extension. Because
         of how MM archives it dbs, the db file will be placed in an
         intervening directory.  Rather then extract it and then move it to
-        the GEOIP_PATH specified in the settings, this method writes the file
+        the `geoip_path` specified in the settings, this method writes the file
         contents directly to the specified filepath
         """
         try:
@@ -72,5 +73,6 @@ class Command(BaseCommand):
                                 shutil.copyfileobj(file_obj, db_file)
                         except shutil.Error as e:
                             raise CommandError(e)
+                        break
         except tarfile.TarError as e:
             raise CommandError(e)

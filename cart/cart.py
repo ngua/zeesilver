@@ -11,12 +11,12 @@ class Cart:
     KEY = getattr(settings, 'CART_KEY', 'CART')
 
     def __init__(self, session):
-        self._session = session  # Django request._session object
+        self.session = session  # Django request.session object
         self._items = {}  # Maps Listing pks to their prices
-        if self.KEY in self._session:
+        if self.KEY in self.session:
             # If the key is already in the session, the cart exists and
             # must be rebuilt from the serialized items stored as its value
-            pks = self._session[self.KEY]
+            pks = self.session[self.KEY]
             self._rebuild_cart(pks)
 
     def __iter__(self):
@@ -26,6 +26,9 @@ class Cart:
 
     def __contains__(self, item):
         return item in self.items
+
+    def __repr__(self):
+        return f"Cart('{self.items}')"
 
     @property
     def count(self):
@@ -55,7 +58,7 @@ class Cart:
             instance = self.query_db(pk)
             self.add(instance, existing=True)
 
-    def _update(self):
+    def update(self):
         """
         Stores a representation of the cart in the session and updates it.
         This method should be called whenever cart items are modified in some
@@ -64,7 +67,7 @@ class Cart:
         Calling `session.modified` is not necessary here, as one of its keys is
         directly modified
         """
-        self._session[self.KEY] = self.serialize()
+        self.session[self.KEY] = self.serialize()
 
     def query_db(self, pk):
         """
@@ -100,7 +103,7 @@ class Cart:
         self._items.update({
             instance.pk: instance.price
         })
-        self._update()
+        self.update()
 
     def remove(self, instance):
         """
@@ -114,7 +117,7 @@ class Cart:
         instance.sold = False
         instance.save()
         self._items.pop(instance.pk)
-        self._update()
+        self.update()
 
     def clear(self):
         """
@@ -126,7 +129,7 @@ class Cart:
         for item in items:
             instance = self.query_db(item)
             self.remove(instance)
-        self._update()
+        self.update()
 
     def serialize(self):
         """

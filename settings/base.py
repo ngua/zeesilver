@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'cart.middleware.CartTimeoutMiddleware',
+    'common.middleware.GeoIPMiddleware'
 ]
 
 ROOT_URLCONF = 'zeesilver.urls'
@@ -223,13 +224,6 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # Honeypot
 HONEYPOT_FIELD_NAME = 'phonenumber'
 
-# Session cart settings
-
-CART_KEY = 'CART'
-# Expiry time, in seconds, before cart items are removed and returned to stock
-CART_TIMEOUT = 3600
-CART_TIMEOUT_KEY = 'CART_TIMEOUT'
-
 # Geoip settings
 
 GEOIP_PATH = os.environ.get('GEOIP_PATH')
@@ -241,3 +235,19 @@ GEODB_COUNTRY = os.environ.get('GEODB_COUNTRY')
 GEODB_CITY = os.environ.get('GEODB_CITY')
 GEODB_COUNTRY_PERMALINK = f'{GEODB_DOMAIN}/{GEODB_COUNTRY}'
 GEODB_CITY_PERMALINK = f'{GEODB_DOMAIN}/{GEODB_CITY}'
+
+# Geolocation restriction settings
+
+GEO_RESTRICTED_VIEWS = ('cart.views',)
+GEO_WHITELIST = ('US',)
+
+# Session cart settings
+
+CART_KEY = 'CART'
+# Expiry time, in seconds, before cart items are removed and returned to stock
+CART_TIMEOUT = 3600
+CART_TIMEOUT_KEY = 'CART_TIMEOUT'
+
+# ipware settings
+PROXY_TRUSTED_IPS = os.environ.get('PROXY_TRUSTED_IPS').split(',')
+PROXY_COUNT = int(os.environ.get('PROXY_COUNT'))

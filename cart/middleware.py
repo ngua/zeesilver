@@ -12,12 +12,12 @@ class CartTimeoutMiddleware:
     reasonable delay
     """
 
-    # Cart expiry in seconds, default one hour
-    TIMEOUT = getattr(settings, 'CART_TIMEOUT', 3600)
-    KEY = getattr(settings, 'CART_TIMEOUT_KEY', 'CART_TIMEOUT')
-
     def __init__(self, get_response):
         self.get_response = get_response
+        # Cart expiry in seconds, default one hour
+        self.timeout = getattr(settings, 'CART_TIMEOUT', 3600)
+        # Key to store serialized cart items in session
+        self.key = getattr(settings, 'CART_TIMEOUT_KEY', 'CART_TIMEOUT')
 
     def __call__(self, request):
         """
@@ -26,20 +26,20 @@ class CartTimeoutMiddleware:
         refreshing the timestamp
 
         NOTE Since the session is modified directly, this also has the side
-        effect of resetting the session cookie expiry
+        effect of resetting the session expiry
         """
         response = self.get_response(request)
-        timestamp = request.session.setdefault(self.KEY, time.time())
+        timestamp = request.session.setdefault(self.key, time.time())
 
         cart = Cart(request.session)
 
         if not cart.is_empty:
-            if time.time() - timestamp > self.TIMEOUT:
+            if time.time() - timestamp > self.timeout:
                 cart.clear()
                 messages.warning(
                     request,
                     'Your cart was automatically cleared due to inactivity'
                 )
 
-        request.session[self.KEY] = time.time()
+        request.session[self.key] = time.time()
         return response
