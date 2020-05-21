@@ -16,16 +16,12 @@ class SearchViewTest(SearchTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_search_filter(self):
-        # Broad search, should contain both fixture listings
-        response = self.client.get(reverse('search'), {'q': 'test'})
-        for listing in Listing.objects.all():
-            self.assertIn(
-                listing,
-                response.context['object_list']
-            )
+        # Broad search, should contain several fixture listings
+        response = self.client.get(reverse('search'), {'q': 'unique'})
+        self.assertGreater(response.context['object_list'], 1,)
         # Should only return the second Listing instance, based on its
         # description
-        response = self.client.get(reverse('search'), {'q': 'another'})
+        response = self.client.get(reverse('search'), {'q': 'amethyst'})
         results = response.context['object_list']
         self.assertEqual(len(results), 1)
         self.assertIn(Listing.objects.get(pk=2), results)

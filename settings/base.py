@@ -109,6 +109,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'common.User'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -240,6 +242,7 @@ GEODB_CITY_PERMALINK = f'{GEODB_DOMAIN}/{GEODB_CITY}'
 
 GEO_RESTRICTED_VIEWS = ('cart.views',)
 GEO_WHITELIST = ('US',)
+GEO_KEY = 'GEOIP'
 
 # Session cart settings
 

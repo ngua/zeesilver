@@ -2,39 +2,94 @@
   pk: 1
   fields:
     name: Jewelry
+- model: listings.category
+  pk: 2
+  fields:
+    name: Pendants
+- model: listings.category
+  pk: 4
+  fields:
+    name: Earrings
+- model: listings.category
+  pk: 5
+  fields:
+    name: Bracelets
 - model: listings.material
-  pk: 1
+  pk: 3
   fields:
     name: Silver
+- model: listings.material
+  pk: 4
+  fields:
+    name: Copper
+- model: listings.material
+  pk: 6
+  fields:
+    name: Amethyst
 - model: listings.listing
   pk: 1
   fields:
-    name: Test
-    description: This is a test
-    picture: test.jpg
-    category: 1
+    name: Pendant
+    description: This is a pendant
+    picture: listings/pendant_pendant.jpg
+    category: 2
     pieces: 2
     price_currency: USD
-    price: '1.00'
+    price: '101.00'
     created: 2020-05-12
     sold: false
-    slug: test
-    search_vector: "'jewelri':6B 'silver':7A 'test':1A,5C"
+    slug: pendant
+    search_vector: "'amethyst'':8A ''pendant'':1A,5C,6B ''silver'':7A'"
     materials:
-      - 1
+    - 3
+    - 6
 - model: listings.listing
   pk: 2
   fields:
-    name: Test 2
-    description: This is another test
-    picture: test2.jpg
+    name: Necklace
+    description: This is a necklace
+    picture: listings/necklace_necklace.jpg
     category: 1
     pieces: 1
     price_currency: USD
-    price: '2.00'
+    price: '102.00'
     created: 2020-05-12
     sold: false
-    slug: test-2
-    search_vector: "'2':2A 'anoth':6C 'jewelri':8B 'silver':9A 'test':1A,7C"
+    slug: necklace
+    search_vector: "'copper'':8A ''jewelri'':6B ''necklac'':1A,5C ''silver'':7A'"
     materials:
-      - 1
+    - 3
+    - 4
+- model: listings.listing
+  pk: 3
+  fields:
+    name: Earrings
+    description: These are unique earrings
+    picture: listings/earrings_earrings.jpg
+    category: 4
+    pieces: 2
+    price_currency: USD
+    price: '203.00'
+    created: 2020-05-13
+    sold: false
+    slug: earrings
+    search_vector: "'copper'':8A ''earring'':1A,5C,6B ''silver'':7A ''uniqu'':4C'"
+    materials:
+    - 3
+    - 4
+- model: listings.listing
+  pk: 4
+  fields:
+    name: Bracelets
+    description: These are unique bracelets
+    picture: listings/bracelets_bracelets.jpg
+    category: 5
+    pieces: 1
+    price_currency: USD
+    price: '101.00'
+    created: 2020-05-14
+    sold: false
+    slug: bracelets
+    search_vector: "'bracelet'':1A,5C,6B ''silver'':7A ''uniqu'':4C'"
+    materials:
+    - 3

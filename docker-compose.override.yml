@@ -17,6 +17,7 @@ services:
     volumes:
       - ./:/app
       - celery_data:/var/run/celery/
+      - geoip2:/geoip2
     command: >
       celery -A zeesilver worker
       -E
@@ -30,6 +31,7 @@ services:
     volumes:
       - ./:/app
       - celery_data:/var/run/celery/
+      - geoip2:/geoip2
     command: >
       celery -A zeesilver beat
       -l info
@@ -53,3 +55,5 @@ volumes:
   postgres_data:
   celery_data:
   geoip2:
+    external:
+      name: geoip2
