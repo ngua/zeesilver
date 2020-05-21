@@ -19,7 +19,7 @@
     created: 2020-05-12
     sold: false
     slug: test
-    search_vector:
+    search_vector: "'jewelri':6B 'silver':7A 'test':1A,5C"
     materials:
       - 1
 - model: listings.listing
@@ -35,6 +35,6 @@
     created: 2020-05-12
     sold: false
     slug: test-2
-    search_vector:
+    search_vector: "'2':2A 'anoth':6C 'jewelri':8B 'silver':9A 'test':1A,7C"
     materials:
       - 1

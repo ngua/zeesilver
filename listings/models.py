@@ -128,7 +128,7 @@ class Listing(models.Model):
     created = models.DateField(default=timezone.now)
     sold = models.BooleanField(default=False)
     slug = models.SlugField(editable=False)
-    search_vector = SearchVectorField(null=True)
+    search_vector = SearchVectorField(null=True, blank=True)
 
     objects = ListingManager()
 
