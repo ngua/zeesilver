@@ -2,6 +2,7 @@ __pycache__/
 *.py[cod]
 .env*
 .vim/
+.coverage
 wait-for-db.sh
 test_data*
 static/styles/css/*

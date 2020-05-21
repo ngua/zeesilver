@@ -1,0 +1,40 @@
+- model: listings.category
+  pk: 1
+  fields:
+    name: Jewelry
+- model: listings.material
+  pk: 1
+  fields:
+    name: Silver
+- model: listings.listing
+  pk: 1
+  fields:
+    name: Test
+    description: This is a test
+    picture: test.jpg
+    category: 1
+    pieces: 2
+    price_currency: USD
+    price: '1.00'
+    created: 2020-05-12
+    sold: false
+    slug: test
+    search_vector:
+    materials:
+      - 1
+- model: listings.listing
+  pk: 2
+  fields:
+    name: Test 2
+    description: This is another test
+    picture: test2.jpg
+    category: 1
+    pieces: 1
+    price_currency: USD
+    price: '2.00'
+    created: 2020-05-12
+    sold: false
+    slug: test-2
+    search_vector:
+    materials:
+      - 1

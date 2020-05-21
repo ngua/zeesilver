@@ -27,7 +27,7 @@ class Cart:
     def __contains__(self, item):
         return item in self.items
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         return f"Cart('{self.items}')"
 
     @property
