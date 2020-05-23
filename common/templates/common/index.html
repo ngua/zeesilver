@@ -5,19 +5,17 @@
 <div class="container-fluid p-0 w-100">
   <div id="carousel" class="carousel carousel-fade" data-ride="carousel" data-interval="5000">
     <ol class="carousel-indicators">
-      {% for item in carousel %}
+      {% for _ in carousel.slide_set.all %}
       <li data-target="#carousel" data-slide-to="{{ forloop.counter0 }}" class="{% if forloop.counter == 1%} active {% endif %}"></li>
       {% endfor %}
     </ol>
     <div class="carousel-inner wrapper">
-      {% for item in carousel %}
+      {% for slide in carousel.slide_set.all %}
       <div class="carousel-item">
-        {% with 'img/'|add:item.img|add:'.jpg' as img_path %}
-        <img class="d-block img-fluid {% if forloop.counter == 1%} active {% endif %}" src="{% static img_path %}">
-        {% endwith %}
+        <img class="d-block img-fluid {% if forloop.counter == 1%} active {% endif %}" src="{{ slide.picture.url }}">
         <div class="carousel-caption d-md-block">
           <h3>Zee Silver</h3>
-          <span class="">{{ item.caption }}</span>
+          <span class="">{{ slide.caption }}</span>
         </div>
       </div>
       {% endfor %}

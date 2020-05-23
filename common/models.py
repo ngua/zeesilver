@@ -1,11 +1,38 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from solo.models import SingletonModel
 
 
 class User(AbstractUser):
-    is_merchant = models.BooleanField(default=False)
+    pass
 
 
-class Merchant(models.Model):
-    user = models.OneToOneField('User', on_delete=models.CASCADE)
-    square_token = models.CharField(max_length=255, blank=True)
+class Carousel(SingletonModel):
+    """
+    Singleton model for carousel in index view. Can be edited from admin
+    interface using Slide inline defined in admin module
+    """
+    def __str__(self):
+        return 'Homepage Carousel'
+
+    class Meta:
+        verbose_name = 'carousel'
+
+
+def slide_upload_path(instance, filename):
+    return f'slides/{filename}'
+
+
+class Slide(models.Model):
+    """
+    Individual slides that compose Carousel model above
+    """
+    caption = models.CharField(max_length=255)
+    picture = models.ImageField(upload_to=slide_upload_path)
+    carousel = models.ForeignKey(Carousel, on_delete=models.CASCADE)
+
+    def __repr__(self):
+        return f"Slide('{self.caption}', '{self.picture}')"
+
+    def __str__(self):
+        return self.caption

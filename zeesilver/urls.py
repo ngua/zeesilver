@@ -21,11 +21,13 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('django.contrib.auth.urls')),
     path('', include('common.urls')),
     path('gallery/', include('listings.urls')),
     path('search/', include('search.urls')),
     path('contact/', include('contact.urls')),
     path('cart/', include('cart.urls')),
+    path('merchant/', include('merchant.urls')),
 ]
 
 if os.environ.get('DJANGO_SETTINGS_MODULE') == 'settings.dev':

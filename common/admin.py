@@ -1,21 +1,17 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Merchant
+from solo.admin import SingletonModelAdmin
+from .models import User, Carousel, Slide
 
 
-class MerchantInline(admin.StackedInline):
-    model = Merchant
-    can_delete = False
-    verbose_name_plural = 'merchant'
+class SlideInline(admin.StackedInline):
+    model = Slide
 
 
-class UserAdmin(UserAdmin):
-    inlines = (MerchantInline,)
-
-    def get_inlines(self, request, obj):
-        if obj.is_merchant:
-            return self.inlines
-        return []
+@admin.register(Carousel)
+class CarouselAdmin(SingletonModelAdmin):
+    inlines = (SlideInline,)
 
 
+admin.site.register(Slide)
 admin.site.register(User, UserAdmin)

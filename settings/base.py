@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 import moneyed
+from django.contrib.messages import constants as message_constants
 from moneyed.localization import _FORMATTER
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -32,9 +33,11 @@ INSTALLED_APPS = [
     'django_bleach',
     'crispy_forms',
     'honeypot',
+    'solo',
     'common',
     'search',
     'cart',
+    'merchant',
     # Application config class necessary for Celery to discover tasks
     'contact.apps.ContactConfig',
     'listings.apps.ListingsConfig'
@@ -67,7 +70,6 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'common.context_processors.price_points',
                 'common.context_processors.in_stock',
-                'common.context_processors.carousel',
                 'search.context_processors.search_form',
                 'cart.context_processors.cart',
             ],
@@ -144,6 +146,14 @@ LISTING_MEDIA = 'listings'
 # Messages settings
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+MESSAGE_TAGS = {
+    message_constants.DEBUG: 'debug',
+    message_constants.INFO: 'info',
+    message_constants.SUCCESS: 'success',
+    message_constants.WARNING: 'warning',
+    message_constants.ERROR: 'danger'
+}
 
 # Redis for caching, celery taskbroker
 REDIS_URI = os.environ.get('REDIS_URI')
@@ -254,3 +264,11 @@ CART_TIMEOUT_KEY = 'CART_TIMEOUT'
 # ipware settings
 PROXY_TRUSTED_IPS = os.environ.get('PROXY_TRUSTED_IPS').split(',')
 PROXY_COUNT = int(os.environ.get('PROXY_COUNT'))
+
+# Square Payment settings
+SQUARE_APPLICATION_ID = os.environ.get('SQUARE_APPLICATION_ID')
+SQUARE_APPLICATION_SECRET = os.environ.get('SQUARE_APPLICATION_SECRET')
+SQUARE_ACCESS_TOKEN = os.environ.get('SQUARE_ACCESS_TOKEN')
+SQUARE_ENVIRONMENT = os.environ.get('SQUARE_ENVIRONMENT')
+SQUARE_DOMAIN = os.environ.get('SQUARE_DOMAIN')
+SQUARE_AUTH_URL = os.environ.get('SQUARE_AUTH_URL')

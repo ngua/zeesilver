@@ -17,10 +17,10 @@ class SearchViewTest(SearchTestCase):
 
     def test_search_filter(self):
         # Broad search, should contain several fixture listings
-        response = self.client.get(reverse('search'), {'q': 'unique'})
-        self.assertGreater(response.context['object_list'], 1,)
-        # Should only return the second Listing instance, based on its
-        # description
+        response = self.client.get(reverse('search'), {'q': 'silver'})
+        print(response.context)
+        self.assertGreater(len(response.context['object_list']), 1,)
+        # Should only return the one Listing instance
         response = self.client.get(reverse('search'), {'q': 'amethyst'})
         results = response.context['object_list']
         self.assertEqual(len(results), 1)

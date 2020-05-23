@@ -1,0 +1,27 @@
+- model: common.carousel
+  pk: 1
+  fields: {}
+- model: common.slide
+  pk: 1
+  fields:
+    caption: 100% pure Sterling silver
+    picture: slides/earrings.jpg
+    carousel: 1
+- model: common.slide
+  pk: 2
+  fields:
+    caption: 100% hand-crafted
+    picture: slides/necklace.jpg
+    carousel: 1
+- model: common.slide
+  pk: 3
+  fields:
+    caption: 100% unique
+    picture: slides/pendant.jpg
+    carousel: 1
+- model: common.slide
+  pk: 4
+  fields:
+    caption: Order now!
+    picture: slides/bracelets.jpg
+    carousel: 1
