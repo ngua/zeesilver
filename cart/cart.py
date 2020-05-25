@@ -1,4 +1,3 @@
-from copy import copy
 from django.conf import settings
 
 
@@ -125,7 +124,7 @@ class Cart:
         item. This is necessary since each item will have to be marked as
         unsold, which requires a db call
         """
-        items = copy(self._items)
+        items = self._items.copy()
         for item in items:
             instance = self.query_db(item)
             self.remove(instance)
@@ -136,6 +135,7 @@ class Cart:
         Produces a list of Listing instance pks. This will be stored as a
         representation of the cart in the session in order to rebuild the cart
         on subsequent requests. Can't use the `items` attribute directly,
-        since dict keys can't be pickled
+        since dict keys can't be pickled. It only serializes instance pks as
+        Money objects cannot be pickled
         """
         return [item for item in self._items]

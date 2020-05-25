@@ -3,8 +3,8 @@ import os
 
 class cd:
     """
-    Context manager utility to use for changing directories and then
-    automatically returning to the original directory.
+    Context manager utility to change directories and return to the original
+    directory upon exit
     """
     def __init__(self, path):
         self.path = path

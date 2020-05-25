@@ -19,8 +19,8 @@ class Command(BaseCommand):
         self.geoip_country = getattr(settings, 'GEOIP_COUNTRY', 'country.mmdb')
         self.geoip_city = getattr(settings, 'GEOIP_CITY', 'city.mmdb')
         self.databases = {
-            self.geoip_country: getattr(settings, 'GEODB_COUNTRY_PERMALINK'),
-            self.geoip_city: getattr(settings, 'GEODB_CITY_PERMALINK'),
+            self.geoip_country: settings.GEODB_COUNTRY_PERMALINK,
+            self.geoip_city: settings.GEODB_CITY_PERMALINK,
         }
 
     def handle(self, *args, **kwargs):
@@ -36,6 +36,7 @@ class Command(BaseCommand):
         with cd(self.geoip_path):
             for db_name, url in self.databases.items():
                 self.fetch_archives(db_name, url)
+        self.stdout.write(self.style.SUCCESS('GeoIP database updated'))
 
     def fetch_archives(self, db_name, url):
         """
