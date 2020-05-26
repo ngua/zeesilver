@@ -7,27 +7,26 @@ class ListingUnavailable(Exception):
 
 class Cart:
     # Used to retrieve an existing session cart, if any
-    KEY = getattr(settings, 'CART_KEY', 'CART')
+    key = getattr(settings, 'CART_KEY', 'CART')
 
     def __init__(self, session):
         self.session = session  # Django request.session object
         self._items = {}  # Maps Listing pks to their prices
-        if self.KEY in self.session:
+        if self.key in self.session:
             # If the key is already in the session, the cart exists and
             # must be rebuilt from the serialized items stored as its value
-            pks = self.session[self.KEY]
+            pks = self.session[self.key]
             self._rebuild_cart(pks)
 
     def __iter__(self):
-        for item in self.items:
-            instance = self.query_db(item)
+        for instance in self.from_db():
             yield instance
 
     def __contains__(self, item):
         return item in self.items
 
     def __repr__(self):  # pragma: no cover
-        return f"Cart('{self.items}')"
+        return f"Cart({self.items})"
 
     @property
     def count(self):
@@ -35,7 +34,7 @@ class Cart:
 
     @property
     def total(self):
-        return sum([price for price in self._items.values()])
+        return sum(price for price in self._items.values())
 
     @property
     def is_empty(self):
@@ -45,14 +44,11 @@ class Cart:
     def items(self):
         return self._items.keys()
 
-    def _rebuild_cart(self, serialized_cart):
+    def _rebuild_cart(self, pks):
         """
         If the cart has been stored in the session, rebuild the cart using
         the Listing instance pks stored therein
         """
-        pks = serialized_cart
-        if not pks:
-            return
         for pk in pks:
             instance = self.query_db(pk)
             self.add(instance, existing=True)
@@ -66,7 +62,16 @@ class Cart:
         Calling `session.modified` is not necessary here, as one of its keys is
         directly modified
         """
-        self.session[self.KEY] = self.serialize()
+        self.session[self.key] = self.serialize()
+
+    def from_db(self):
+        """
+        Returns a queryset of items currently in cart
+        """
+        from listings.models import Listing
+        return Listing.objects.filter(
+            id__in=[*self.items]
+        )
 
     def query_db(self, pk):
         """

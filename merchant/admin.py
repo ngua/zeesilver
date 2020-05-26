@@ -6,8 +6,8 @@ from .models import SquareConfig
 @admin.register(SquareConfig)
 class SquareConfigAdmin(SingletonModelAdmin):
     """
-    Set fields to read-only to ensure that instance can only be changed through
-    defined endpoints
+    Set all fields to read-only to ensure that instance can only be changed
+    through views
     """
     fields = ['created', 'expires', 'active']
 

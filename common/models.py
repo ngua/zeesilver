@@ -1,10 +1,30 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
 from solo.models import SingletonModel
 
 
 class User(AbstractUser):
     pass
+
+
+class BaseCustomer(models.Model):
+    """
+    Base class for creating customer/contact models
+    """
+    phone_validator = RegexValidator(
+        r'^\(?[2-9]\d{2}\)?\s?\d{3}(?:\-|\s)?\d{4}$',
+        message='Please enter a valid US phone number, including area code',
+    )
+
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+    phone = models.CharField(
+        max_length=14, validators=[phone_validator], blank=True
+    )
+
+    class Meta:
+        abstract = True
 
 
 class Carousel(SingletonModel):

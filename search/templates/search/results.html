@@ -2,8 +2,8 @@
 {% load static bleach_tags zeesilver_extras %}
 {% block title %}Search{% endblock %}
 {% block breadcrumb %}
-<li><a href="{% url 'index' %}">Home</a></li>
-<li class="active">Search Results</li>
+{% breadcrumb %}
+{% breadcrumb_active 'Search Results' %}
 {% endblock %}
 {% block content %}
 <div id="results" class="row justify-content-center">

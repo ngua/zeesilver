@@ -24,7 +24,7 @@ class SquareConfig(SingletonModel):
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
     )
 
-    def update(self, user, body):
+    def update(self, body, user=None):
         """
         Update the fields directly through model , rather than filtering
         through manager and updating
@@ -34,9 +34,12 @@ class SquareConfig(SingletonModel):
             self.expires = parse_datetime(body.get('expires_at', ''))
         except ValueError:
             pass  # TODO derive the expiration based on creation date
+        # Log the user making the request, unless token is refreshed through
+        # Celery task, in which case method is called without `user` param
+        if user is not None:
+            self.user = user
         self.access_token = body.get('access_token', '')
         self.refresh_token = body.get('refresh_token', '')
-        self.user = user
         self.active = True
         self.created = timezone.now()
         self.save()
@@ -44,7 +47,7 @@ class SquareConfig(SingletonModel):
     @classmethod
     def reset(cls):
         """
-        Delete existing singleton instance in order to erase existing OAuth
+        Deletes existing singleton instance in order to erase the OAuth
         configuration
         """
         cls.get_solo().delete()

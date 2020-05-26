@@ -28,6 +28,7 @@ urlpatterns = [
     path('contact/', include('contact.urls')),
     path('cart/', include('cart.urls')),
     path('merchant/', include('merchant.urls')),
+    path('shop/', include('shop.urls')),
 ]
 
 if os.environ.get('DJANGO_SETTINGS_MODULE') == 'settings.dev':

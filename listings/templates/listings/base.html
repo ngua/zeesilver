@@ -1,5 +1,6 @@
 {% extends "common/base.html" %}
+{% load zeesilver_extras %}
 {% block title %}Gallery{% endblock %}
 {% block breadcrumb %}
-<li><a href="{% url 'index' %}">Home</a></li>
+{% breadcrumb %}
 {% endblock %}

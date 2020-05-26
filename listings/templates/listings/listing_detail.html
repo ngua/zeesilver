@@ -3,8 +3,8 @@
 {% block title %}{{ listing.name }} | {{ block.super }}{% endblock %}
 {% block breadcrumb %}
 {{ block.super }}
-<li><a href="{% url 'listing-filter' %}">Gallery</a></li>
-<li class="active">{{ listing.name }}</li>
+{% breadcrumb 'Gallery' 'listing:filter' %}
+{% breadcrumb_active listing.name %}
 {% endblock %}
 {% block content %}
 <div id="pic-modal" class="modal fade row" tabindex="-1">

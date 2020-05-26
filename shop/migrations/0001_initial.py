@@ -2,6 +2,7 @@
 
 import django.core.validators
 from django.db import migrations, models
+import localflavor.us.models
 
 
 class Migration(migrations.Migration):
@@ -13,15 +14,20 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Contact',
+            name='Order',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
                 ('email', models.EmailField(max_length=254)),
                 ('phone', models.CharField(blank=True, max_length=14, validators=[django.core.validators.RegexValidator('^\\(?[2-9]\\d{2}\\)?\\s?\\d{3}(?:\\-|\\s)?\\d{4}$', message='Please enter a valid US phone number, including area code')])),
-                ('subject', models.CharField(choices=[('SALES', 'Sales'), ('RETURNS', 'Returns'), ('CUSTOM', 'Custom'), ('OTHER', 'Other')], default='SALES', max_length=8)),
-                ('message', models.TextField()),
-                ('date', models.DateField(auto_now_add=True)),
+                ('first_name', models.CharField(max_length=255)),
+                ('last_name', models.CharField(max_length=255)),
+                ('address', models.CharField(max_length=16)),
+                ('city', models.CharField(max_length=32)),
+                ('state', localflavor.us.models.USStateField(max_length=2)),
+                ('zip_code', localflavor.us.models.USZipCodeField(max_length=10)),
+                ('number', models.CharField(blank=True, max_length=16)),
+                ('status', models.PositiveIntegerField(choices=[(1, 'Unpaid'), (2, 'Paid'), (3, 'Shipped'), (0, 'Cancelled')], default=1)),
+                ('created', models.DateTimeField(auto_now_add=True)),
             ],
             options={
                 'abstract': False,

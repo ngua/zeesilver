@@ -61,3 +61,13 @@ def jumbotron(heading, lead, text=''):
 @register.filter
 def quote(value):
     return f'"{value}"'
+
+
+@register.inclusion_tag('common/tags/breadcrumb.html')
+def breadcrumb(name='Home', location='index'):
+    return {'name': name, 'location': location}
+
+
+@register.inclusion_tag('common/tags/breadcrumb_active.html')
+def breadcrumb_active(name):
+    return {'name': name}

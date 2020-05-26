@@ -2,7 +2,7 @@
 {% load static bleach_tags zeesilver_extras %}
 {% block breadcrumb %}
 {{ block.super }}
-<li class="active">Gallery</li>
+{% breadcrumb_active 'Gallery' %}
 {% endblock %}
 {% block content %}
 <div id="top" class="row justify-content-center">
@@ -13,7 +13,7 @@
         {% filter_options 'by price' option='prices' %}
         <div class="pb-3 justify-content-center">
           <div class="mx-3 mx-sm-0 d-sm-inline">
-            <a href="{% url 'listing-filter' %}" class="btn btn-secondary d-inline m-3">
+            <a href="{% url 'listing:filter' %}" class="btn btn-secondary d-inline m-3">
               Clear All
               <span class="fas fa-times-circle"></span>
             </a>

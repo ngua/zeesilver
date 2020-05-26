@@ -1,0 +1,21 @@
+{% extends "shop/base.html" %}
+{% load crispy_forms_tags honeypot %}
+{% block title %}Checkout{{ block.super }}{% endblock %}
+{% block content %}
+{{ block.super }}
+<div class="row justify-content-center">
+  <div class="col-lg-6 col-12">
+    <form action="{% url 'shop:order' %}" method="POST" novalidate>{% csrf_token %}
+      {% render_honeypot_field %}
+      {% crispy form %}
+      <div class="d-flex justify-content-center">
+        <input type="submit" name="submit" class="btn btn-secondary m-2" value="Pay Now">
+        <input type="submit" name="cancel" class="btn btn-danger m-2" value="Cancel">
+      </div>
+    </form>
+    <!-- <div class="d-flex justify-content-center mt-3"> -->
+    <!--   <a class="btn btn-danger" href="">Cancel</a> -->
+    <!-- </div> -->
+  </div>
+</div>
+{% endblock %}

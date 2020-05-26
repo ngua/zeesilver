@@ -33,7 +33,7 @@
       {% for price in prices %}
       <div class="prices m-2 col-md-3 col-sm-12 text-center">
         <div class="block h-100">
-          <a href="{% url 'listing-filter' %}?price__lte={{ price.amount }}">
+          <a href="{% url 'listing:filter' %}?price__lte={{ price.amount }}">
             <h3>{{ price }}</h3>
             <small>And below</small>
             <div class="my-auto">
@@ -58,7 +58,7 @@
             </h5>
             <div>
               <p class="d-inline p-2">See more</p>
-              <a href="{% url 'listing-filter' %}?category={{ listing.category }}" class="d-inline p-2">
+              <a href="{% url 'listing:filter' %}?category={{ listing.category }}" class="d-inline p-2">
                 <span class="fas fa-angle-double-right"></span>
               </a>
             </div>

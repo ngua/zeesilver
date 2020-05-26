@@ -18,7 +18,7 @@ class CartSessionTestCase(CartTestCase):
         """
         Test basic cart functionality
         """
-        listing = Listing.objects.get(pk=1)
+        listing = Listing.objects.first()
         session = self.client.session
         cart = Cart(session)
         cart.add(listing)
@@ -42,28 +42,28 @@ class CartSessionTestCase(CartTestCase):
         Test if session stores serialized cart items and removes them
         when the cart is cleared
         """
-        listing = Listing.objects.get(pk=1)
+        listing = Listing.objects.first()
         session = self.client.session
         cart = Cart(session)
         cart.add(listing)
-        self.assertIsNotNone(session[cart.KEY])
-        self.assertIn(listing.pk, session[cart.KEY])
+        self.assertIsNotNone(session[cart.key])
+        self.assertIn(listing.pk, session[cart.key])
         cart.clear()
-        self.assertFalse(session[cart.KEY])
+        self.assertFalse(session[cart.key])
 
     def test_cart_raises(self):
         """
         Test raising an exception by trying to add a sold Listing instance to
         a different session cart
         """
-        listing = Listing.objects.get(pk=1)
+        listing = Listing.objects.first()
         session = self.client.session
         cart1 = Cart(session)
         cart1.add(listing)
         # Change the session dictionary to create a different cart object
         session.update({
             'session_key': 'test',
-            Cart.KEY: []
+            Cart.key: []
         })
         cart2 = Cart(session)
         self.assertNotEqual(cart1, cart2)
@@ -79,13 +79,13 @@ class CartViewTestCase(CartTestCase):
         Test that cart add/remove views successfully store and update
         serialized carts in session dictionary, and redirect properly
         """
-        listing = Listing.objects.get(pk=1)
+        listing = Listing.objects.first()
         response = self.client.post(
             reverse('cart-add'), {'listing': listing.slug}
         )
         self.assertRedirects(response, '/')
         session = self.client.session
-        self.assertIn(listing.pk, session[Cart.KEY])
+        self.assertIn(listing.pk, session[Cart.key])
 
         # Test if removing an item with a non-empty cart correctly redirects
         # back to the cart status view
@@ -109,7 +109,7 @@ class CartViewTestCase(CartTestCase):
         Test that clients can retrieve and view stored cart data
         """
         # Add item first
-        listing = Listing.objects.get(pk=1)
+        listing = Listing.objects.first()
         self.client.post(
             reverse('cart-add'), {'listing': listing.slug}
         )
@@ -118,7 +118,7 @@ class CartViewTestCase(CartTestCase):
         self.assertIn(b'$', response.content)
 
     def test_cart_clear_view(self):
-        listing = Listing.objects.get(pk=1)
+        listing = Listing.objects.first()
         self.client.post(
             reverse('cart-add'), {'listing': listing.slug}
         )
@@ -126,7 +126,7 @@ class CartViewTestCase(CartTestCase):
         session = self.client.session
         cart = Cart(session)
         self.assertFalse(cart.items)
-        self.assertFalse(session[Cart.KEY])
+        self.assertFalse(session[Cart.key])
 
     def test_bad_post_redirect(self):
         """
@@ -160,7 +160,7 @@ class CartMiddlewareTestCase(CartTestCase):
         setting to simulate exceeding the maximum period of inactivity allowed
         """
         # Add listing to cart
-        listing = Listing.objects.get(pk=1)
+        listing = Listing.objects.first()
         self.client.post(
             reverse('cart-add'), {'listing': listing.slug}
         )

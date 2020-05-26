@@ -32,7 +32,7 @@
         </h5>
         <div>
           {% if config_active %}
-          <form action="{% url 'square-renew' %}" method="POST">{% csrf_token %}
+          <form action="{% url 'merchant:renew' %}" method="POST">{% csrf_token %}
             <input type="submit" class="btn btn-secondary" value="Renew authorization">
           </form>
           {% else %}
@@ -52,7 +52,7 @@
         </h5>
         <div>
           {% if config_active %}
-          <form action="{% url 'square-revoke' %}" method="POST">{% csrf_token %}
+          <form action="{% url 'merchant:revoke' %}" method="POST">{% csrf_token %}
             <input type="submit" class="btn btn-secondary" value="Revoke authorization">
           </form>
           {% else %}

@@ -1,7 +1,7 @@
 import logging
 from django.conf import settings
 from django.contrib import messages
-from django.urls import reverse
+from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.utils.http import urlencode
 from django.views.generic import TemplateView, View
@@ -26,6 +26,7 @@ class SquareViewMixin(PermissionRequiredMixin, View):
     dispatch method
     """
     permission_required = 'merchant.obtain_tokens'
+    redirect_url = reverse_lazy('merchant:manage')
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -37,6 +38,17 @@ class SquareViewMixin(PermissionRequiredMixin, View):
         )
         self.oauth_api = client.o_auth
         self.square_config = SquareConfig.get_solo()
+
+    def log_error(self, request_type, result):
+        """
+        Generic logging for failed requests to Square Connect
+        """
+        logger.error(
+            (
+                f'Square OAuth {request_type} failed: {result.errors} '
+                f'({result.type})'
+            )
+        )
 
 
 class SquareManagementView(SquareViewMixin, TemplateView):
@@ -78,33 +90,25 @@ class SquareCallbackView(SquareViewMixin):
 
         if not auth_code:
             messages.error(self.request, 'Square Connect authorization failed')
-            logger.error('Failed to connect to Square auth endpoint')
-            return redirect(reverse('square-manage'))
+            logger.error('Failed to connect to Square OAuth endpoint')
+            return redirect(self.redirect_url)
 
         body = square_connect_request(
             grant_type='authorization_code', code=auth_code
         )
         result = self.oauth_api.obtain_token(body)
+
         if result.is_success():
-            self.handle_success(result)
-        else:
-            self.handle_error()
+            # Update the square_config singleton instance
+            self.square_config.update(body=result.body, user=self.request.user)
+            logger.info('Square OAuth authorization succeeded')
+            messages.success(self.request, 'Authorization successful')
+        # Check `is_error` explicitly
+        elif result.is_error():
+            self.log_error('authorization', result)
+            messages.error(self.request, 'Authorization failed')
 
-        return redirect(reverse('square-manage'))
-
-    def handle_success(self, result):
-        """
-        Updates the singleton SquareConfig instance. `access_token`
-        and `refresh_token` are encrypted before being committed to db via
-        EncryptionField defined in ./fields.py
-        """
-        self.square_config.update(user=self.request.user, body=result.body)
-        logger.info('Square OAuth authorization succeeded')
-        messages.success(self.request, 'Authorization successful')
-
-    def handle_error(self):
-        logger.info('Square OAuth authorization failed')
-        messages.error(self.request, 'Authorization failed')
+        return redirect(self.redirect_url)
 
 
 class SquarePostableMixin(SquareViewMixin):
@@ -122,7 +126,7 @@ class SquarePostableMixin(SquareViewMixin):
                     'authorize application'
                 )
             )
-            return redirect(reverse('square-manage'))
+            return redirect(self.redirect_url)
 
 
 class SquareRevokeView(SquarePostableMixin):
@@ -139,23 +143,25 @@ class SquareRevokeView(SquarePostableMixin):
         """
         authorization = f'Client {settings.SQUARE_APPLICATION_SECRET}'
         # Manually construct the body, since its parameters differ from the
-        # other two requests (includes access token, but excludes client
+        # other two requests (i.e. includes access token, but excludes client
         # secret)
         body = {
             'client_id': settings.SQUARE_APPLICATION_ID,
             'access_token': self.square_config.access_token
         }
         result = self.oauth_api.revoke_token(body, authorization)
+
         if result.is_success():
             logger.info('Square OAuth successfully revoked')
             messages.info(self.request, 'Authorization revoked')
             # Delete the existing SquareConfig instance
             self.square_config.reset()
-        else:
-            logger.error('Square OAuth revocation failed')
+        # Again, check `is_error` explicitly
+        elif result.is_error():
+            self.log_error('revocation', result)
             messages.error(self.request, 'Revocation failed')
 
-        return redirect(reverse('square-manage'))
+        return redirect(self.redirect_url)
 
 
 class SquareRenewView(SquarePostableMixin):
@@ -171,9 +177,9 @@ class SquareRenewView(SquarePostableMixin):
             logger.info('Square OAuth renewal succeeded')
             messages.success(self.request, 'Authorization renewed')
             # Update the existing SquareConfig instance
-            self.square_config.update(user=self.request.user, body=result.body)
-        else:
-            logger.error('Square OAuth renewal failed')
+            self.square_config.update(body=result.body, user=self.request.user)
+        elif result.is_error():
+            self.log_error('renewal', result)
             messages.error(self.request, 'Renewal failed')
 
-        return redirect(reverse('square-manage'))
+        return redirect(self.redirect_url)

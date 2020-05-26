@@ -34,13 +34,14 @@ INSTALLED_APPS = [
     'crispy_forms',
     'honeypot',
     'solo',
+    'localflavor',
     'common',
     'search',
     'cart',
     'merchant',
-    # Application config class necessary for Celery to discover tasks
-    'contact.apps.ContactConfig',
-    'listings.apps.ListingsConfig'
+    'contact',
+    'listings',
+    'shop'
 ]
 
 MIDDLEWARE = [
@@ -182,7 +183,6 @@ CELERY_RESULT_BACKEND = REDIS_URI
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_IMPORTS = ('listings.tasks', 'contact.tasks')
 
 # Ckeditor settings
 

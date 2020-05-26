@@ -128,6 +128,7 @@ class Listing(models.Model):
     created = models.DateField(default=timezone.now)
     sold = models.BooleanField(default=False)
     slug = models.SlugField(editable=False)
+    order = models.ForeignKey('shop.Order', null=True, on_delete=models.SET_NULL)
     search_vector = SearchVectorField(null=True, blank=True, editable=False)
 
     objects = ListingManager()
@@ -138,7 +139,7 @@ class Listing(models.Model):
 
     def get_absolute_url(self):
         return reverse(
-            'listing-detail',
+            'listing:detail',
             kwargs={
                 'category': self.category.name.lower(),
                 'slug': self.slug

@@ -23,7 +23,7 @@
           </button>
           <div class="collapse navbar-collapse" id="navbar-toggle">
             <div class="navbar-nav mr-auto">
-              <a class="nav-item nav-link my-1" href="{% url 'listing-filter' %}">Gallery</a>
+              <a class="nav-item nav-link my-1" href="{% url 'listing:filter' %}">Gallery</a>
               <a class="nav-item nav-link my-1" href="">About</a>
               <a class="nav-item nav-link my-1" href="{% url 'contact' %}">Contact</a>
             </div>
@@ -35,7 +35,7 @@
                 </form>
               </div>
               <div id="cart-status">
-                <a class="nav-item" href="{% url 'cart' %}">
+                <a class="nav-item" href="{% url 'cart:status' %}">
                   <i
                     class="fas fa-shopping-cart fa-lg my-lg-4 mx-md-4 my-sm-3 {% if not cart.is_empty %}dot{% endif %}"
                     data-toggle="tooltip"
@@ -92,7 +92,7 @@
               <a href="{% url 'index' %}" data-toggle="tooltip" title="Home">
                 <span class="fas fa-home fa-sm mx-1" style="color: gray;"></span>
               </a>
-              <a href="{% url 'listing-filter' %}" data-toggle="tooltip" title="Gallery">
+              <a href="{% url 'listing:filter' %}" data-toggle="tooltip" title="Gallery">
                 <span class="fas fa-ring fa-sm mx-1" style="color: gray;"></span>
               </a>
               <a href="{% url 'contact' %}" data-toggle="tooltip" title="Contact">

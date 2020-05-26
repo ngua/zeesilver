@@ -2,8 +2,8 @@
 {% load zeesilver_extras %}
 {% block title %}Cart{% endblock %}
 {% block breadcrumb %}
-<li><a href="{% url 'index' %}">Home</a></li>
-<li class="active">Cart</li>
+{% breadcrumb %}
+{% breadcrumb_active 'Cart' %}
 {% endblock %}
 {% block content %}
 <div id="cart" class="row mt-4 justify-content-center">
@@ -26,7 +26,7 @@
           <h5>
             {{ item.pieces }} piece{{ item.pieces|pluralize }}
           </h5>
-          <form id="clear" method="POST" action="{% url 'cart-remove' %}">{% csrf_token %}
+          <form id="clear" method="POST" action="{% url 'cart:remove' %}">{% csrf_token %}
             <input type="hidden" id="listing" name="listing" value="{{ item.slug }}">
             <button type="submit" class="cart-button">
               <span
@@ -52,12 +52,12 @@
     <h4><span class="font-weight-bold">Total</span>: {{ cart.total }}</h4>
   </div>
   <div>
-    <form id="clear" method="POST" action="{% url 'cart-clear' %}">{% csrf_token %}
+    <form id="clear" method="POST" action="{% url 'cart:clear' %}">{% csrf_token %}
       <button class="btn btn-danger mx-2 font-weight-bold" type="submit">Clear Cart</button>
     </form>
   </div>
   <div>
-    <a class="btn btn-secondary mx-2 text-light font-weight-bold">Checkout</a>
+    <a href="{% url 'shop:order' %}" class="btn btn-secondary mx-2 text-light font-weight-bold">Checkout</a>
   </div>
   {% endif %}
 </div>
