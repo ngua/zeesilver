@@ -11,7 +11,7 @@ body, body-wrapper {
 }
 
 legend {
-  font-family: $monserrat;
+  font-family: $beth-ellen;
   color: $grey;
 
   .border-bottom {
@@ -25,7 +25,24 @@ a {
   &:hover {
     color: $light-blue;
   }
+}
 
+a.btn {
+  &.btn-info {
+    background-color: #7da9d9;
+
+    &:hover {
+      background-color: #6187b0;
+    }
+  }
+
+  &.btn-danger {
+    background-color: $brick-red;
+
+    &:hover {
+      background-color: #a72e2c;
+    }
+  }
 }
 
 nav.navbar {

@@ -1,0 +1,19 @@
+{% extends "shop/base.html" %}
+{% load zeesilver_extras %}
+{% block title %}Cancel{{ block.super }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center mb-3">
+  <div id="progress" class="col-12 text-center">
+    <div class="w-50 mx-auto">
+      {% legend 'Cancel' %}
+    </div>
+    <div>
+      <form class="shop d-inline" method="POST">{% csrf_token %}
+        <p>Are you sure you want to cancel your order?</p>
+        <input type="submit" class="btn btn-danger" value="Confirm">
+        <a class="btn btn-secondary d-inline p-2" href="{{ url }}">Go Back</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

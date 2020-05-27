@@ -42,7 +42,7 @@
           {{ listing.description|bleach }}
         </div>
         <div class="d-block">
-          <form class="d-inline" action="{% url 'cart-add' %}" method="post">{% csrf_token %}
+          <form class="d-inline" action="{% url 'cart:add' %}" method="post">{% csrf_token %}
             <input type="hidden" name="listing" value="{{ listing.slug }}">
             <button {% if listing.sold %}disabled{% endif %} type="submit" class="btn btn-secondary">Add to Cart</button>
           </form>

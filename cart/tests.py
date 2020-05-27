@@ -81,7 +81,7 @@ class CartViewTestCase(CartTestCase):
         """
         listing = Listing.objects.first()
         response = self.client.post(
-            reverse('cart-add'), {'listing': listing.slug}
+            reverse('cart:add'), {'listing': listing.slug}
         )
         self.assertRedirects(response, '/')
         session = self.client.session
@@ -91,16 +91,16 @@ class CartViewTestCase(CartTestCase):
         # back to the cart status view
         listing2 = Listing.objects.get(pk=2)
         self.client.post(
-            reverse('cart-add'), {'listing': listing2.slug}
+            reverse('cart:add'), {'listing': listing2.slug}
         )
         response = self.client.post(
-            reverse('cart-remove'), {'listing': listing.slug}
+            reverse('cart:remove'), {'listing': listing.slug}
         )
-        self.assertRedirects(response, reverse('cart'))
+        self.assertRedirects(response, reverse('cart:status'))
 
         # Clear cart and redirect back to index view
         response = self.client.post(
-            reverse('cart-remove'), {'listing': listing2.slug}
+            reverse('cart:remove'), {'listing': listing2.slug}
         )
         self.assertRedirects(response, '/')
 
@@ -111,18 +111,18 @@ class CartViewTestCase(CartTestCase):
         # Add item first
         listing = Listing.objects.first()
         self.client.post(
-            reverse('cart-add'), {'listing': listing.slug}
+            reverse('cart:add'), {'listing': listing.slug}
         )
-        response = self.client.get(reverse('cart'))
+        response = self.client.get(reverse('cart:status'))
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'$', response.content)
 
     def test_cart_clear_view(self):
         listing = Listing.objects.first()
         self.client.post(
-            reverse('cart-add'), {'listing': listing.slug}
+            reverse('cart:add'), {'listing': listing.slug}
         )
-        self.client.post(reverse('cart-clear'))
+        self.client.post(reverse('cart:clear'))
         session = self.client.session
         cart = Cart(session)
         self.assertFalse(cart.items)
@@ -133,7 +133,7 @@ class CartViewTestCase(CartTestCase):
         Test if adding non-existent Listing raises Http404 exception
         """
         response = self.client.post(
-            reverse('cart-add'), {'listing': ''}
+            reverse('cart:add'), {'listing': ''}
         )
         self.assertEqual(response.status_code, 404)
 
@@ -162,10 +162,10 @@ class CartMiddlewareTestCase(CartTestCase):
         # Add listing to cart
         listing = Listing.objects.first()
         self.client.post(
-            reverse('cart-add'), {'listing': listing.slug}
+            reverse('cart:add'), {'listing': listing.slug}
         )
         # Attempt to view cart
-        response = self.client.get(reverse('cart'))
+        response = self.client.get(reverse('cart:status'))
         self.assertIn(b'Your cart was automatically cleared', response.content)
         session = self.client.session
         cart = Cart(session)

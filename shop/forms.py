@@ -27,7 +27,7 @@ class OrderForm(forms.ModelForm):
                 ),
                 Div(
                     Div('phone', css_class='col-md-4 mb-3'),
-                    Div('address', css_class='col-md-8 mb-3'),
+                    Div('street_address', css_class='col-md-8 mb-3'),
                     css_class='form-row'
                 ),
                 Div(
@@ -42,6 +42,6 @@ class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = [
-            'first_name', 'last_name', 'address', 'email', 'phone',
+            'first_name', 'last_name', 'email', 'phone', 'street_address',
             'city', 'state', 'zip_code'
         ]

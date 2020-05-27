@@ -1,0 +1,46 @@
+{% extends "shop/base.html" %}
+{% load zeesilver_extras %}
+{% block title %}Review{{ block.super }}{% endblock %}
+{% block step %}
+{% legend 'Review Your Order' %}
+<div id="review" class="row justify-content-center bg-dark">
+  <div class="col-12 text-center mb-4 border-bottom">
+    <h4>
+      Order #{{ object.number }}
+    </h4>
+  </div>
+  <div class="col-lg-6 col-md-12">
+    <h4 class="text-center">Shipping Information:</h4>
+    <table class="table table-dark">
+      {% for label, value in object.summary.items %}
+      <tr>
+        <th scope="row">{{ label }}:</th>
+        <td>{{ value }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  <div class="col-lg-6 col-md-12">
+    <h4 class="text-center">Items:</h4>
+    <table class="table table-dark">
+      {% for listing in object.listing_set.all %}
+      <tr>
+        <td>{{ listing.name }}</td>
+        <td>{{ listing.price }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <th scope="row">Total: </th>
+        <td>{{ object.total }}</td>
+      </tr>
+    </table>
+  </div>
+</div>
+<div class="row justify-content-center mt-3">
+  <div class="col-lg-6 col-md-12 text-center">
+    <a href="{% url 'shop:cancel' %}" class="btn btn-danger m-2">Cancel</a>
+    <a href="{% url 'shop:update' %}" class="btn btn-info m-2">Back</a>
+    <a href="{% url 'shop:pay' %}" class="btn btn-secondary m-2">Continue</a>
+  </div>
+</div>
+{% endblock %}

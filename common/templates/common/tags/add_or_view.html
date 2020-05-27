@@ -7,7 +7,7 @@
     title="Details">
   </span>
 </a>
-<form class="d-inline" action="{% url 'cart-add' %}" method="POST">{% csrf_token %}
+<form class="d-inline" action="{% url 'cart:add' %}" method="POST">{% csrf_token %}
   <input type="hidden" id="listing" name="listing" value="{{ listing.slug }}">
   <button {% if listing.sold %}disabled{% endif %} type="submit" class="cart-button">
     <span

@@ -2,9 +2,21 @@
 {% load zeesilver_extras %}
 {% block title %} | Shop{% endblock %}
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-lg-6 col-12 text-center">
+<div class="row justify-content-center mb-3">
+  <div id="progress" class="col-12 text-center">
     {% legend 'Checkout' %}
+    <h3></h3>
+    <ul>
+      {% for step, view in steps.items %}
+      <li class="{% if view == current %}active{% endif %}">{{ step }}</li>
+      {% endfor %}
+    </ul>
+    <hr>
+  </div>
+</div>
+<div class="row justify-content-center">
+  <div class="col-lg-6 col-12">
+    {% block step %}{% endblock %}
   </div>
 </div>
 {% endblock %}

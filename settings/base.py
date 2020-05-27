@@ -250,7 +250,7 @@ GEODB_CITY_PERMALINK = f'{GEODB_DOMAIN}/{GEODB_CITY}'
 
 # Geolocation restriction settings
 
-GEO_RESTRICTED_VIEWS = ('cart.views',)
+GEO_RESTRICTED_VIEWS = ('cart.views', 'shop.views')
 GEO_WHITELIST = ('US',)
 GEO_KEY = 'GEOIP'
 
@@ -272,3 +272,6 @@ SQUARE_ACCESS_TOKEN = os.environ.get('SQUARE_ACCESS_TOKEN')
 SQUARE_ENVIRONMENT = os.environ.get('SQUARE_ENVIRONMENT')
 SQUARE_DOMAIN = os.environ.get('SQUARE_DOMAIN')
 SQUARE_AUTH_URL = os.environ.get('SQUARE_AUTH_URL')
+
+# Order settings
+ORDER_KEY = 'ORDER'

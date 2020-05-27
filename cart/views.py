@@ -27,9 +27,9 @@ class CartAddView(CartViewMixin):
         slug = self.request.POST.get('listing')
         try:
             listing = Listing.objects.get(slug=slug)
+            self.cart.add(listing)
         except (Listing.DoesNotExist, ListingUnavailable):
-            raise Http404
-        self.cart.add(listing)
+            raise Http404()
         messages.success(
             request,
             mark_safe(

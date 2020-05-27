@@ -1,0 +1,21 @@
+{% extends "shop/base.html" %}
+{% load static crispy_forms_tags honeypot %}
+{% block title %}Checkout{{ block.super }}{% endblock %}
+{% block content %}
+{{ block.super }}
+<div class="row justify-content-center">
+  <div class="col-lg-6 col-12">
+    <form id="order" class="shop" action="{{ action }}" method="POST" novalidate>{% csrf_token %}
+      {% render_honeypot_field %}
+      {% crispy form %}
+    </form>
+    {% block cancel %}{% endblock %}
+    <div class="d-flex justify-content-center border-top mt-2">
+      {% block input %}{% endblock %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block body_js %}
+<script src="{% static 'js/phone.js' %}"></script>
+{% endblock %}
