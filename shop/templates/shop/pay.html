@@ -1,0 +1,39 @@
+{% extends "shop/base.html" %}
+{% load static zeesilver_extras %}
+{% block head %}
+<script src="{{ square_payment_library }}"></script>
+{% endblock %}
+{% block title %}Payment{{ block.super }}{% endblock %}
+{% block step %}
+<div id="shop" class="text-center">
+  <div>
+    <i class="fab m-1 fa-cc-visa fa-3x "></i>
+    <i class="fab m-1 fa-cc-mastercard fa-3x "></i>
+    <i class="fab m-1 fa-cc-amex fa-3x "></i>
+    <i class="fab m-1 fa-cc-discover fa-3x "></i>
+  </div>
+  <div>
+    <img class="img-fluid" src="{% static 'img/square.png' %}" alt="">
+  </div>
+  <div id="form-container">
+    <div id="sq-card-number"></div>
+    <div class="third" id="sq-expiration-date"></div>
+    <div class="third" id="sq-cvv"></div>
+    <div class="third" id="sq-postal-code"></div>
+    <button
+      id="sq-creditcard"
+      class="button-credit-card">
+      Pay {{ amount }}
+    </button>
+    <div class="text-center">
+      <a href="{% url 'shop:cancel' %}" class="btn btn-danger m-2">Cancel</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block body_js %}
+{{ square_application_id|json_script:'square-application-id' }}
+{{ payment_url|json_script:'payment-url' }}
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+<script src="{% static 'js/pay.js' %}"></script>
+{% endblock %}

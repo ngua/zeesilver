@@ -4,6 +4,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@200&display=swap');
 
 $screen-lg-min: 992px;
+$screen-md-min: 640px;
 
 $blue-white: #e8f1ff;
 $dark-grey: #282828;
@@ -23,6 +24,12 @@ $crimson: 'Crimson Pro', serif;
 
 @mixin lg {
   @media (min-width: #{$screen-lg-min}) {
+    @content;
+  }
+}
+
+@mixin md {
+  @media (min-width: #{$screen-md-min}) {
     @content;
   }
 }

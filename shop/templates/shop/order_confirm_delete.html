@@ -10,8 +10,12 @@
     <div>
       <form class="shop d-inline" method="POST">{% csrf_token %}
         <p>Are you sure you want to cancel your order?</p>
-        <input type="submit" class="btn btn-danger" value="Confirm">
-        <a class="btn btn-secondary d-inline p-2" href="{{ url }}">Go Back</a>
+        <small class="text-muted">This will delete your current order and empty your cart</small>
+        <hr>
+        <div class="mt-3">
+          <input type="submit" class="btn btn-danger" value="Confirm">
+          <a class="btn btn-secondary d-inline p-2" href="{{ url }}">Go Back</a>
+        </div>
       </form>
     </div>
   </div>

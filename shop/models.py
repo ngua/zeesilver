@@ -1,36 +1,10 @@
-import re
-import secrets
 from django.db import models
 from django.core import signing
+from django.urls import reverse
+from django.conf import settings
 from localflavor.us.models import USStateField, USZipCodeField
 from common.models import BaseCustomer
-
-
-class OrderManager(models.Manager):
-    @staticmethod
-    def generate_number():
-        """
-        Generates random hex number, converts it to an int, then to a string,
-        then joins every 4th char with `-` to make a readable order number for
-        customers
-
-        Example: `6769-2583-4952`
-
-        NOTE Depending on the hex value returned by secrets, the int may be
-        12 digits or 8 (much higher probability of the former). Loop ensures
-        consistent length
-        """
-        while True:
-            number = '-'.join(re.findall(
-                r'\d{4}', str(int(secrets.token_hex(6), 16))
-            ))
-            if len(number) == 14:
-                return number
-
-    def verify_token(self, token):
-        value = signing.loads(token)
-        number = value['number']
-        return self.get(number=number)
+from .managers import OrderManager, PaymentManager
 
 
 class Order(BaseCustomer):
@@ -49,6 +23,7 @@ class Order(BaseCustomer):
     city = models.CharField(max_length=32)
     state = USStateField()
     zip_code = USZipCodeField()
+    tracking = models.CharField(max_length=127, blank=True)
     # `null` and `blank` both required to avoid unique constraint violations
     number = models.CharField(
         max_length=16, blank=True, null=True, unique=True
@@ -57,6 +32,7 @@ class Order(BaseCustomer):
         choices=Status.choices, default=Status.UNPAID
     )
     created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     objects = OrderManager()
 
@@ -64,6 +40,9 @@ class Order(BaseCustomer):
         if not self.number:
             self.number = self.__class__.objects.generate_number()
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('shop:status', kwargs={'token': self.token()})
 
     def add_from_cart(self, cart):
         """
@@ -79,10 +58,15 @@ class Order(BaseCustomer):
         self.status = self.Status.CANCELED
         self.save()
 
+    def finalize(self, session):
+        self.status = self.Status.PAID
+        self.save()
+        del session[settings.CART_KEY]
+        del session[settings.ORDER_KEY]
+
     def summary(self):
         """
-        Produces simple dictionary of attributes and labels for use in
-        templates
+        Produces dictionary of attributes and labels for use in template
         """
         return {
             'Name': self.name,
@@ -93,21 +77,21 @@ class Order(BaseCustomer):
 
     def serialize(self):
         """
-        Creates a simple representation of the order to be saved in the
-        session
+        Creates representation of the order to be saved in the session
         """
-        return {
-            'number': self.number,
-            'status': self.status
-        }
+        return {'number': self.number, 'status': self.status}
 
     def token(self):
         """
         Creates token for URL
         """
-        return signing.dumps({
-            'number': self.number
-        })
+        return signing.dumps({'number': self.number})
+
+    def units(self):
+        """
+        Returns instance price in cents and string representation of currency
+        """
+        return str(self.total.currency), int(self.total.amount) * 100
 
     @property
     def total(self):
@@ -129,3 +113,19 @@ class Order(BaseCustomer):
 
     def __str__(self):
         return f'{self.number}, {self.name}, {self.email}'
+
+
+class Payment(models.Model):
+    square_payment_id = models.CharField(max_length=64)
+    square_order_id = models.CharField(max_length=64)
+    created = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=32)
+    order = models.OneToOneField(Order, on_delete=models.CASCADE)
+
+    objects = PaymentManager()
+
+    def __repr__(self):
+        return f"Payment('{self.order.number}')"
+
+    def __str__(self):
+        return f'{self.order.number}: {self.status}'

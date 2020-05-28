@@ -98,10 +98,8 @@ aside {
 }
 
 #related {
-  margin-top: 100px;
-
   @include lg {
-    margin-top: 0;
+    margin-top: 35px;
   }
 
   .wrapper {

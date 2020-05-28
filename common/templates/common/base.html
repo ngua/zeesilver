@@ -9,6 +9,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'styles/css/app.css' %}">
     <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
     <title> {% block title %} {% endblock %} | Zee Silver </title>
+    {% block head %}{% endblock %}
   </head>
   <body>
     <div class="d-flex flex-column body-wrapper">
@@ -48,6 +49,11 @@
                     >
                   </i>
                 </a>
+                {% if not cart.is_empty %}
+                <a class="nav-item" href="{% url 'shop:order' %}">
+                  <i class="fas fa-credit-card fa-lg" data-toggle="tooltip" data-placement="bottom" title="Check out now"></i>
+                </a>
+                {% endif %}
               </div>
             </div>
           </div>

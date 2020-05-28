@@ -1,5 +1,5 @@
 {% extends "shop/base_form.html" %}
 {% block input %}
-<input form="order" type="submit" name="submit" class="btn btn-secondary m-2 d-inline" value="Continue">
 <a href="{% url 'shop:cancel' %}" class="btn btn-danger m-2 d-inline">Cancel</a>
+<input form="order" type="submit" name="submit" class="btn btn-secondary m-2 d-inline" value="Continue">
 {% endblock %}

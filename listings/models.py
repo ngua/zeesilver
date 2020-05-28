@@ -1,43 +1,15 @@
-from django.db import models
+from django.db import models, transaction
 from django.urls import reverse
 from django.conf import settings
 from django.utils import timezone
 from django.utils.text import slugify
-from django.db.models import signals, TextField, Value as V
-from django.db import transaction
-from django.db.models.functions import Concat
+from django.db.models import signals
 from django.dispatch import receiver
 from django.contrib.postgres.indexes import GinIndex
-from django.contrib.postgres.search import SearchVectorField, SearchVector
-from django.contrib.postgres.aggregates import StringAgg
+from django.contrib.postgres.search import SearchVectorField
 from djmoney.models.fields import MoneyField
 from ckeditor.fields import RichTextField
-
-
-class CategoryQuerySet(models.QuerySet):
-    def in_stock(self):
-        """
-        Returns all Category instances with at least one unsold related
-        Listing object
-        """
-        return self.filter(listing__sold=False).distinct()
-
-
-class CategoryManager(models.Manager):
-    def get_queryset(self):
-        return CategoryQuerySet(self.model, using=self._db)
-
-    def in_stock(self):
-        return self.get_queryset().in_stock()
-
-    def get_example_listings(self):
-        """
-        Yields one example Listing instance for each category
-        with at least one unsold related Listing. For use in
-        the index view
-        """
-        for category in self.in_stock().distinct():
-            yield category.listing_set.unsold().first()
+from .managers import CategoryManager, ListingManager
 
 
 class Category(models.Model):
@@ -64,53 +36,6 @@ class Material(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class ListingQuerySet(models.QuerySet):
-    def unsold(self):
-        return self.filter(sold=False)
-
-
-class ListingManager(models.Manager.from_queryset(ListingQuerySet)):
-    def generate_summary(self):
-        """
-        Creates a field for aggregating all text fields into a single
-        searchable value. Postgres' SearchVector cannot include joined
-        fields since it uses Django's F expression, so this step is
-        necessary to search Listing through the Category and Material `name`
-        attributes in the Listing SearchVectorField.
-        Since this is a rather computationally intensive task, it shouldn't
-        be called in the ListingManager `get_queryset` method directly,
-        otherwise it will affect all Listing db calls
-        """
-        return self.get_queryset().annotate(
-            summary=Concat(
-                'name', V(' '),
-                'description', V(' '),
-                'category__name', V(' '),
-                StringAgg('materials__name', delimiter=' '),
-                output_field=TextField()
-            )
-        )
-
-    def query_summary(self):
-        """
-        Adds the annotated `summary` value to the queryset. For
-        use in the Listing `save` method for post-save search
-        vector update
-        """
-        vector = (
-            SearchVector('name', weight='A') +
-            SearchVector('description', weight='C') +
-            SearchVector('category__name', weight='B') +
-            SearchVector(StringAgg(
-                'materials__name', delimiter=' '
-            ), weight='A')
-        )
-        return self.generate_summary().annotate(summary=vector)
-
-    def unsold(self):
-        return self.get_queryset().unsold()
 
 
 def listing_upload_path(instance, filename):

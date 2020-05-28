@@ -53,11 +53,11 @@
   </div>
   <div>
     <form id="clear" method="POST" action="{% url 'cart:clear' %}">{% csrf_token %}
-      <button class="btn btn-danger mx-2 font-weight-bold p-2" type="submit">Clear Cart</button>
+      <input class="btn btn-danger mx-2" type="submit" value="Clear Cart">
     </form>
   </div>
   <div>
-    <a href="{% url 'shop:order' %}" class="btn btn-secondary mx-2 text-light font-weight-bold">Checkout</a>
+    <a href="{% url 'shop:order' %}" class="btn btn-secondary mx-2 ">Checkout</a>
   </div>
   {% endif %}
 </div>
