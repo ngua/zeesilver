@@ -1,0 +1,57 @@
+{% extends "common/base.html" %}
+{% load zeesilver_extras %}
+{% block title %}Order Status{{ block.super }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-sm-12">
+    {% legend 'Your Order' %}
+    <div id="status" class="p-3 h-100">
+      <div class="container-fluid">
+        <h2 class="d-inline">Order #<span class="font-weight-bold">{{ object.number }}</span></h2>
+        <i class="fas fa-{% if object.shipped_on %}truck{% else %}check-circle{% endif %} fa-lg d-inline ml-2"></i>
+        <hr>
+        <div class="row">
+          <div class="col-lg-6 col-12">
+            <table class="table table-borderless">
+              <tr>
+                <th scope="row">Status:</th>
+                <td>{{ object.get_status_display }}</td>
+                <tr>
+                  <th scope="row">Total:</th>
+                  <td>{{ object.total }}</td>
+                </tr>
+                <tr>
+                  <th>Payment Completed:</th>
+                  <td>{{ object.payment.created }}</td>
+                </tr>
+                {% if object.shipped_on %}
+                <tr>
+                  <th>Shipped on:</th>
+                  <td>{{ object.shipped_on }}</td>
+                </tr>
+                <tr>
+                  <th>Tracking:</th>
+                  <td>{{ object.tracking|default:'No tracking information available' }}</td>
+                </tr>
+                {% endif %}
+              </tr>
+            </table>
+          </div>
+          <div class="col-lg-6 col-12">
+            <table class="table table-borderless">
+              {% for label, value in object.summary.items %}
+              <tr>
+                {% if value %}
+                <th scope="row">{{ label }}:</th>
+                <td>{{ value }}</td>
+                {% endif %}
+              </tr>
+              {% endfor %}
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

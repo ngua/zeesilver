@@ -33,6 +33,22 @@ form {
   }
 }
 
+#status {
+  background: $light-grey;
+
+  div {
+    font-family: $crimson;
+  }
+
+  table {
+    font-size: 20px;
+
+    @include md {
+      border-left: 1px solid rgba(0, 0, 0, .1);
+    }
+  }
+}
+
 #progress {
   ul {
     counter-reset: step;

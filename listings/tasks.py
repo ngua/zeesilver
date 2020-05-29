@@ -2,8 +2,8 @@ from celery.decorators import task
 from .models import Listing
 
 
-@task(name='update_search_task')
-def update_search_task(pk):
+@task(name='update_search')
+def update_search(pk):
     """
     Updates a Listing instance's search vector field following
     db saves. Not strictly necessary at this stage to offload it

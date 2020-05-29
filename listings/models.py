@@ -85,12 +85,12 @@ class Listing(models.Model):
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
         if 'search_vector' not in kwargs.get('update_fields', {}):
-            from .tasks import update_search_task
+            from .tasks import update_search
             # 'on_commit' necessary to avoid race condition between
             # Django and Celery when accessing model instance
             # NOTE Remember that TransactionTestCase is needed for tests
             transaction.on_commit(
-                lambda: update_search_task.delay(self.pk)
+                lambda: update_search.delay(self.pk)
             )
 
     def get_related(self, limit=10):

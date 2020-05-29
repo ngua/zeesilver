@@ -1,0 +1,17 @@
+<p>Thank you for your order, {{ order.name }}!</p>
+<p>A summary of your order:</p>
+<hr>
+{% for listing in order.listing_set.all %}
+<p>{{ listing.name }}: {{ listing.price }}</p>
+{% endfor %}
+<hr>
+<p>Total: {{ order.total }}</p>
+<hr>
+<p>We'll ship your order within the next 3-5 business days. You can track your order status by clicking on the following link: </p>
+<p><a href="{{ site_name }}{{ order.get_absolute_url }}">Your order</a></p>
+<p>
+  Please don't hesitate to reach out if you have any questions. This email address is not monitored for responses, but you can get in
+  touch through contact@zeesilver.com
+</p>
+<p>Best regards,</p>
+<p>Zee Silver</p>

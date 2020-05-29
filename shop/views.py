@@ -3,22 +3,30 @@ from uuid import uuid4
 from collections import OrderedDict
 from django.conf import settings
 from django.contrib import messages
+from django.template import loader
+from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
 from django.http import Http404, JsonResponse
-from django.shortcuts import redirect, get_object_or_404
 from django.core.signing import BadSignature
 from django.views.generic import (
     View, CreateView, DetailView, DeleteView, UpdateView
 )
 from django.views.generic.base import ContextMixin
+from django.views.generic.detail import SingleObjectMixin
+from django.contrib.sites.shortcuts import get_current_site
 from square.client import Client
+from common.tasks import notify_admins
 from cart.cart import Cart
 from .models import Order, Payment
 from .forms import OrderForm
 from .utils import cancel_order
+from .tasks import customer_order_notification
 
 
 class OrderProgressMixin(ContextMixin):
+    """
+    Adds order steps and current progress to context for display in template
+    """
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
@@ -36,6 +44,9 @@ class OrderProgressMixin(ContextMixin):
 
 
 class OrderMixin(OrderProgressMixin, View):
+    """
+    Instantiates session cart for order views
+    """
     http_method_names = ['get', 'post']
 
     def setup(self, request, *args, **kwargs):
@@ -52,7 +63,7 @@ class OrderMixin(OrderProgressMixin, View):
         return super().dispatch(request, *args, **kwargs)
 
 
-class OrderSessionMixin(OrderMixin):
+class OrderSessionMixin(SingleObjectMixin, OrderMixin):
     """
     Retrieves serialized order from session
     """
@@ -109,6 +120,7 @@ class UpdateOrderView(OrderSessionMixin, UpdateView):
         to generic form in template
         """
         context = super().get_context_data(**kwargs)
+        # Change the current step back to create view
         context.update({
             'current': 'OrderCreateView',
             'action': reverse('shop:update')
@@ -121,6 +133,7 @@ class PaymentView(OrderSessionMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # Add necessary context to include in json_script tags
         context.update({
             'square_application_id': settings.SQUARE_APPLICATION_ID,
             'payment_url': reverse('shop:charge'),
@@ -130,35 +143,21 @@ class PaymentView(OrderSessionMixin, DetailView):
         return context
 
 
-class ChargeView(OrderMixin):
+class ChargeView(OrderSessionMixin):
     http_method_names = ['post']
 
-    def setup(self, request, *args, **kwargs):
-        """
-        Tries to fetch the order from the session.  This is not an generic
-        editing view, so OrderSessionMixin is not appropriate.
-        """
-        super().setup(request, *args, **kwargs)
-        order = request.session.get(self.key)
-        if order is None:
-            raise Http404()
-        number, _ = order.values()
-        self.order = get_object_or_404(Order, number=number)
-        self.client = Client(
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        client = Client(
             access_token=settings.SQUARE_ACCESS_TOKEN,
             environment=settings.SQUARE_ENVIRONMENT
         )
-
-    def get_success_url(self):
-        return self.order.get_absolute_url()
-
-    def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
         nonce = data.get('nonce')
         if nonce is None:
             return self.charge_invalid()
 
-        currency, amount = self.order.units()
+        currency, amount = self.object.units()
         idempotency_key = str(uuid4())
         body = {
             'source_id': nonce,
@@ -168,23 +167,31 @@ class ChargeView(OrderMixin):
                 'amount': amount
             }
         }
-        result = self.client.payments.create_payment(body)
+        result = client.payments.create_payment(body)
         if result.is_success():
             return self.charge_valid(result)
         else:
             return self.charge_invalid()
 
     def charge_valid(self, result):
-        session = self.request.session
-        Payment.objects.from_response(result, self.order)
-        self.object.finalize(session)
-        return JsonResponse({
-            'url': self.get_success_url(),
-        })
+        Payment.objects.from_response(result, self.object)
+        self.object.finalize(self.request.session)
+        customer_order_notification.delay(
+            order_pk=self.object.pk,
+            site_name=str(get_current_site(self.request))
+        )
+        notify_admins.delay(
+            subject='New Order at zeesilver.com',
+            body=loader.render_to_string(
+                'shop/order_admin_email.html',
+                {'order': self.object}
+            )
+        )
+        return JsonResponse({'url': self.object.get_absolute_url()})
 
     def charge_invalid(self):
         cancel_order(
-            instance=self.order,
+            instance=self.object,
             cart=self.cart,
             key=self.key,
             session=self.request.session
@@ -194,17 +201,17 @@ class ChargeView(OrderMixin):
 
 class OrderStatusView(OrderProgressMixin, DetailView):
     queryset = Order.objects.all()
-    template = 'order_status.html'
+    template_name = 'shop/order_status.html'
 
     def get_object(self):
-        token = self.kwargs.get('token', '')
-        if not token:
+        token = self.kwargs.get('token')
+        if token is None:
             raise Http404()
         try:
             obj = Order.objects.verify_token(token)
+            return obj
         except BadSignature:
             raise Http404()
-        return obj
 
 
 class CancelOrderView(OrderSessionMixin, DeleteView):

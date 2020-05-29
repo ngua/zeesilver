@@ -2,6 +2,8 @@ from django.db import models
 from django.core import signing
 from django.urls import reverse
 from django.conf import settings
+from django.dispatch import receiver
+from django.db.models import signals
 from localflavor.us.models import USStateField, USZipCodeField
 from common.models import BaseCustomer
 from .managers import OrderManager, PaymentManager
@@ -23,6 +25,7 @@ class Order(BaseCustomer):
     city = models.CharField(max_length=32)
     state = USStateField()
     zip_code = USZipCodeField()
+    shipped_on = models.DateTimeField(null=True)
     tracking = models.CharField(max_length=127, blank=True)
     # `null` and `blank` both required to avoid unique constraint violations
     number = models.CharField(
@@ -129,3 +132,13 @@ class Payment(models.Model):
 
     def __str__(self):
         return f'{self.order.number}: {self.status}'
+
+
+@receiver(signals.pre_save, sender=Order)
+def update_status(sender, instance, **kwargs):
+    try:
+        obj = Order.objects.get(pk=instance.pk)
+    except Order.DoesNotExist:
+        return
+    if instance.shipped_on and instance.shipped_on != obj.shipped_on:
+        instance.status = Order.Status.SHIPPED
