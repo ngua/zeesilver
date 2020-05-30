@@ -35,7 +35,6 @@ const paymentForm = new SqPaymentForm({
       if (errors) {
         return;
       }
-      console.log(nonce);
       sendNonce(nonce);
     }
   }
@@ -50,8 +49,8 @@ cardButton.addEventListener('click', (e) => {
   paymentForm.requestCardNonce();
 });
 
-function sendNonce(nonce) {
-  fetch(paymentUrl, {
+async function sendNonce(nonce) {
+  await fetch(paymentUrl, {
     method: 'POST',
     headers: new Headers({
       'Content-Type': 'application/json',
@@ -67,4 +66,9 @@ function sendNonce(nonce) {
       window.location.replace(url);
     })
     .catch(error => {console.log(`Error: ${error}`)})
+
+  const formContainer = document.querySelector('#form-container');
+  const spinner = document.createElement('div');
+  spinner.classList.add('spinner');
+  formContainer.parentNode.replaceChild(spinner, formContainer);
 }

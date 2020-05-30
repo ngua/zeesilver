@@ -4,16 +4,22 @@ services:
   web:
     build: .
     image: zeesilver
+    volumes:
+      - geoip2:/geoip2
 
   celery:
     image: zeesilver
     depends_on:
       - web
+    volumes:
+      - geoip2:/geoip2
 
   celery-beat:
     image: zeesilver
     depends_on:
       - web
+    volumes:
+      - geoip2:/geoip2
 
   redis:
     image: redis:5.0-alpine
@@ -21,3 +27,8 @@ services:
     ports:
       - "6382:6382"
     command: ["redis-server", "--port", "6382"]
+
+volumes:
+  geoip2:
+    external:
+      name: geoip2

@@ -1,4 +1,6 @@
+import io
 import json
+import weasyprint
 from uuid import uuid4
 from collections import OrderedDict
 from django.conf import settings
@@ -6,7 +8,7 @@ from django.contrib import messages
 from django.template import loader
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
-from django.http import Http404, JsonResponse
+from django.http import Http404, JsonResponse, FileResponse, HttpResponse
 from django.core.signing import BadSignature
 from django.views.generic import (
     View, CreateView, DetailView, DeleteView, UpdateView
@@ -23,7 +25,7 @@ from .utils import cancel_order
 from .tasks import customer_order_notification
 
 
-class OrderProgressMixin(ContextMixin):
+class ProgressMixin(ContextMixin):
     """
     Adds order steps and current progress to context for display in template
     """
@@ -34,8 +36,7 @@ class OrderProgressMixin(ContextMixin):
             'steps': OrderedDict([
                 ('Shipping Information', 'OrderCreateView'),
                 ('Review Your Order', 'ReviewOrderView'),
-                ('Payment', 'PaymentView'),
-                ('Success!', 'OrderStatusView'),
+                ('Payment', 'PaymentView')
             ]),
             # Get current view name to style with CSS in template
             'current': self.__class__.__name__
@@ -43,7 +44,7 @@ class OrderProgressMixin(ContextMixin):
         return context
 
 
-class OrderMixin(OrderProgressMixin, View):
+class OrderMixin(ProgressMixin, View):
     """
     Instantiates session cart for order views
     """
@@ -63,7 +64,7 @@ class OrderMixin(OrderProgressMixin, View):
         return super().dispatch(request, *args, **kwargs)
 
 
-class OrderSessionMixin(SingleObjectMixin, OrderMixin):
+class SessionMixin(SingleObjectMixin, OrderMixin):
     """
     Retrieves serialized order from session
     """
@@ -105,11 +106,11 @@ class OrderCreateView(OrderMixin, CreateView):
         return super().form_valid(form)
 
 
-class ReviewOrderView(OrderSessionMixin, DetailView):
+class ReviewOrderView(SessionMixin, DetailView):
     pass
 
 
-class UpdateOrderView(OrderSessionMixin, UpdateView):
+class UpdateOrderView(SessionMixin, UpdateView):
     form_class = OrderForm
     success_url = reverse_lazy('shop:review')
     template_name = 'shop/order_update_form.html'
@@ -128,8 +129,8 @@ class UpdateOrderView(OrderSessionMixin, UpdateView):
         return context
 
 
-class PaymentView(OrderSessionMixin, DetailView):
-    template_name = 'shop/pay.html'
+class PaymentView(SessionMixin, DetailView):
+    template_name = 'shop/order_pay.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -143,7 +144,7 @@ class PaymentView(OrderSessionMixin, DetailView):
         return context
 
 
-class ChargeView(OrderSessionMixin):
+class ChargeView(SessionMixin):
     http_method_names = ['post']
 
     def post(self, request, *args, **kwargs):
@@ -199,10 +200,12 @@ class ChargeView(OrderSessionMixin):
         return JsonResponse({'url': reverse('index')})
 
 
-class OrderStatusView(OrderProgressMixin, DetailView):
+class StatusMixin:
     queryset = Order.objects.all()
-    template_name = 'shop/order_status.html'
 
+    """
+    Retrieves and decodes token from url kwarg
+    """
     def get_object(self):
         token = self.kwargs.get('token')
         if token is None:
@@ -214,7 +217,37 @@ class OrderStatusView(OrderProgressMixin, DetailView):
             raise Http404()
 
 
-class CancelOrderView(OrderSessionMixin, DeleteView):
+class OrderStatusView(StatusMixin, DetailView):
+    template_name = 'shop/order_status.html'
+
+
+class OrderInvoiceView(StatusMixin, DetailView):
+    template_name = 'shop/order_invoice.html'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(**kwargs)
+        buffer = io.BytesIO()
+        html = loader.render_to_string(self.template_name, context)
+        stylesheet = weasyprint.CSS('/app/static/styles/css/app.css')
+        weasyprint.HTML(string=html).write_pdf(
+            buffer, stylesheets=[stylesheet]
+        )
+        buffer.seek(0)
+        return FileResponse(buffer, filename='invoice.pdf')
+
+
+class OrderResendEmailView(StatusMixin, DetailView):
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        customer_order_notification.delay(
+            order_pk=self.object.pk,
+            site_name=str(get_current_site(self.request))
+        )
+        return HttpResponse(status=204)
+
+
+class CancelOrderView(SessionMixin, DeleteView):
     success_url = reverse_lazy('index')
 
     def get_context_data(self, **kwargs):

@@ -45,7 +45,8 @@ class PaymentManager(models.Manager):
         params = {
             'square_payment_id': payment.get('id', ''),
             'square_order_id': payment.get('order_id', ''),
-            'status': payment.get('status', ''),
+            'receipt_number': payment.get('receipt_number', ''),
+            'receipt_url': payment.get('receipt_url', ''),
             'order': order
         }
         return self.create(**params)

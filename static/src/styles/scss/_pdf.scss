@@ -1,0 +1,64 @@
+@import 'vars';
+
+#invoice {
+  border: 1px solid $light-grey;
+  color: $grey;
+  height: 100%;
+  padding: 20px;
+
+  p {
+    margin: 5px 0;
+    font-size: 12px;
+    color: $medium-grey;
+  }
+
+  h1, h4 {
+    font-family: serif;
+  }
+
+  span.label {
+    font-weight: bold;
+    color: $grey;
+  }
+
+  div.block {
+    margin-top: 20px;
+  }
+
+  h4 {
+    margin: 0px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin: 20px 0;
+
+    th {
+      &[scope=row] {
+        font-weight: bold;
+      }
+    }
+
+    th, td {
+      text-align:left;
+      font-size:14px;
+      padding:10px;
+      margin:0;
+    }
+
+    tr {
+      background: $light-grey;
+
+      &:nth-child(odd) {
+        background: $snow;
+      }
+    }
+
+    thead th {
+      background: $light-grey;
+      font-weight: bold;
+    }
+  }
+}

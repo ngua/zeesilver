@@ -21,3 +21,4 @@ squareup==5.2.2.20200422
 django-localflavor==3.0.1
 cryptography==2.9.2
 html2text==2020.1.16
+WeasyPrint==51

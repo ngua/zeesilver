@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <div id="invoice">
+      <div class="block">
+        <h1>Zeesilver</h1>
+        <p><span class="label">Customer Service: </span>contact@zeesilver.com</p>
+        <h4>Order Invoice</h4>
+      </div>
+      <div class="block">
+        <p>Order #{{ object.number }}</p>
+        <p>Generated on: {% now 'M d, Y' %}</p>
+      </div>
+      <hr>
+      <div class="block">
+        <h4>Billed to:</h4>
+        {% for label, value in object.summary.items %}
+        <p><span class="label">{{ label }}: </span>{{ value }}</p>
+        {% endfor %}
+      </div>
+      <div class="block">
+        <h4>Items:</h4>
+        <table>
+          <thead>
+            <th>Item</th>
+            <th>Price</th>
+          </thead>
+          {% for listing in object.listing_set.all %}
+          <tr>
+            <td>{{ listing.name }}</td>
+            <td>{{ listing.price }}</td>
+          </tr>
+          {% endfor %}
+          <tr>
+            <th scope="row">Total: </th>
+            <td>{{ object.total }}</td>
+          </tr>
+        </table>
+      </div>
+      <div class="block">
+        <p><span class="label">Status: </span>{{ object.get_status_display|upper }}</p>
+        <p><span class="label">Paid on: </span>{{ object.payment.created }}</p>
+        {% if object.shipped %}
+        <p><span class="label">Shipped on: </span>{{ object.shipment.created }}</p>
+        {% endif %}
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,8 +1,8 @@
 {% extends "shop/base_form.html" %}
 {% block cancel %}
-<form id="cancel" class="shop" action="{{ url }}" method="POST">{% csrf_token %}</form>
+<form id="cancel" class="shop" action="{% url 'cart:clear' %}" method="POST">{% csrf_token %}</form>
 {% endblock %}
 {% block input %}
-<input form="order" type="submit" name="submit" class="btn btn-secondary m-2 d-inline" value="Continue">
 <input form="cancel" type="submit" class="btn btn-danger m-2 d-inline" value="Cancel">
+<input form="order" type="submit" name="submit" class="btn btn-secondary m-2 d-inline" value="Continue">
 {% endblock %}

@@ -5,7 +5,8 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-RUN apt-get update && apt-get install -y libpq-dev gcc netcat
+RUN apt-get update && apt-get install -y libpq-dev gcc netcat libcairo2-dev \
+        libffi-dev python-lxml shared-mime-info libpango1.0-0 libcairo2 libgdk-pixbuf2.0-0
 
 COPY ./requirements /app/requirements
 RUN pip install -r /app/requirements/dev.txt

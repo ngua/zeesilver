@@ -2,8 +2,6 @@ from django.db import models
 from django.core import signing
 from django.urls import reverse
 from django.conf import settings
-from django.dispatch import receiver
-from django.db.models import signals
 from localflavor.us.models import USStateField, USZipCodeField
 from common.models import BaseCustomer
 from .managers import OrderManager, PaymentManager
@@ -25,8 +23,6 @@ class Order(BaseCustomer):
     city = models.CharField(max_length=32)
     state = USStateField()
     zip_code = USZipCodeField()
-    shipped_on = models.DateTimeField(null=True)
-    tracking = models.CharField(max_length=127, blank=True)
     # `null` and `blank` both required to avoid unique constraint violations
     number = models.CharField(
         max_length=16, blank=True, null=True, unique=True
@@ -97,6 +93,10 @@ class Order(BaseCustomer):
         return str(self.total.currency), int(self.total.amount) * 100
 
     @property
+    def shipped(self):
+        return hasattr(self, 'shipment')
+
+    @property
     def total(self):
         return sum(listing.price for listing in self.listing_set.all())
 
@@ -115,30 +115,41 @@ class Order(BaseCustomer):
         return f"Order('{self.first_name}', '{self.last_name}', {self.email})"
 
     def __str__(self):
-        return f'{self.number}, {self.name}, {self.email}'
+        return self.number
 
 
 class Payment(models.Model):
     square_payment_id = models.CharField(max_length=64)
     square_order_id = models.CharField(max_length=64)
+    receipt_number = models.CharField(max_length=64)
+    receipt_url = models.URLField()
     created = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=32)
     order = models.OneToOneField(Order, on_delete=models.CASCADE)
 
     objects = PaymentManager()
 
     def __repr__(self):
-        return f"Payment('{self.order.number}')"
+        return f"Payment('{self.square_order_id}')"
 
     def __str__(self):
-        return f'{self.order.number}: {self.status}'
+        return f'Square Payment #{self.square_order_id}'
 
 
-@receiver(signals.pre_save, sender=Order)
-def update_status(sender, instance, **kwargs):
-    try:
-        obj = Order.objects.get(pk=instance.pk)
-    except Order.DoesNotExist:
-        return
-    if instance.shipped_on and instance.shipped_on != obj.shipped_on:
-        instance.status = Order.Status.SHIPPED
+class Shipment(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    tracking = models.CharField(max_length=127, blank=True)
+    order = models.OneToOneField(Order, on_delete=models.CASCADE)
+
+    def save(self, *args, **kwargs):
+        # Check if instance is newly created. If so, set related order
+        # instance status to shipped
+        if not self.pk:
+            self.order.status = Order.Status.SHIPPED
+            self.order.save()
+        super().save(*args, **kwargs)
+
+    def __repr__(self):
+        return f"Shipment('{self.tracking}')"
+
+    def __str__(self):
+        return f'Shipment: Tracking #{self.tracking}'
