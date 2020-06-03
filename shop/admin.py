@@ -52,7 +52,6 @@ class PaymentInline(admin.TabularInline):
     fields = ('receipt_number', 'receipt_url')
     readonly_fields = ('receipt_number', 'receipt_url')
     show_change_link = True
-    actions = ['export']
 
 
 @admin.register(Order)

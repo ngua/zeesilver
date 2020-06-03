@@ -42,7 +42,9 @@
       </div>
       <div class="block">
         <p><span class="label">Status: </span>{{ object.get_status_display|upper }}</p>
+        {% if object.paid %}
         <p><span class="label">Paid on: </span>{{ object.payment.created }}</p>
+        {% endif %}
         {% if object.shipped %}
         <p><span class="label">Shipped on: </span>{{ object.shipment.created }}</p>
         {% endif %}

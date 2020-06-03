@@ -93,6 +93,10 @@ class Order(BaseCustomer):
         return str(self.total.currency), int(self.total.amount) * 100
 
     @property
+    def paid(self):
+        return hasattr(self, 'payment')
+
+    @property
     def shipped(self):
         return hasattr(self, 'shipment')
 

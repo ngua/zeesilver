@@ -53,7 +53,9 @@ class Listing(models.Model):
     created = models.DateField(default=timezone.now)
     sold = models.BooleanField(default=False)
     slug = models.SlugField(editable=False)
-    order = models.ForeignKey('shop.Order', null=True, on_delete=models.SET_NULL)
+    order = models.ForeignKey(
+        'shop.Order', null=True, blank=True, on_delete=models.SET_NULL
+    )
     search_vector = SearchVectorField(null=True, blank=True, editable=False)
 
     objects = ListingManager()

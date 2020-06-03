@@ -1,5 +1,5 @@
 {% extends "common/base.html" %}
-{% load zeesilver_extras %}
+{% load static zeesilver_extras %}
 {% block title %}Order Status{{ block.super }}{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
@@ -20,10 +20,12 @@
                   <th scope="row">Total:</th>
                   <td>{{ object.total }}</td>
                 </tr>
+                {% if object.paid %}
                 <tr>
                   <th>Payment Completed:</th>
                   <td>{{ object.payment.created }}</td>
                 </tr>
+                {% endif %}
                 {% if object.shipped %}
                 <tr>
                   <th>Shipped on:</th>
@@ -57,7 +59,12 @@
 <div class="row justify-content-center">
   <div class="col-12 text-center">
     <a class="btn btn-secondary" href="{% url 'shop:invoice' token=object.token %}">View PDF Invoice</a>
-    <a class="btn btn-secondary" href="{% url 'shop:email' token=object.token %}">Resend Order Email</a>
+    <a id="resend" class="btn btn-secondary" href="{% url 'shop:email' token=object.token %}">Resend Order Email</a>
+    <div id="message">
+    </div>
   </div>
 </div>
+{% endblock %}
+{% block body_js %}
+<script src="{% static 'js/status.js' %}"></script>
 {% endblock %}

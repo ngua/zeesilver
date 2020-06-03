@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.template import loader
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
-from django.http import Http404, JsonResponse, FileResponse, HttpResponse
+from django.http import Http404, JsonResponse, FileResponse
 from django.core.signing import BadSignature
 from django.views.generic import (
     View, CreateView, DetailView, DeleteView, UpdateView
@@ -229,6 +229,7 @@ class OrderInvoiceView(StatusMixin, DetailView):
         context = self.get_context_data(**kwargs)
         buffer = io.BytesIO()
         html = loader.render_to_string(self.template_name, context)
+        # TODO remove hard-coded css path
         stylesheet = weasyprint.CSS('/app/static/styles/css/app.css')
         weasyprint.HTML(string=html).write_pdf(
             buffer, stylesheets=[stylesheet]
@@ -244,7 +245,9 @@ class OrderResendEmailView(StatusMixin, DetailView):
             order_pk=self.object.pk,
             site_name=str(get_current_site(self.request))
         )
-        return HttpResponse(status=204)
+        return JsonResponse({
+            'message': 'Order confirmation email sent!'
+        })
 
 
 class CancelOrderView(SessionMixin, DeleteView):
