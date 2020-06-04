@@ -144,7 +144,7 @@ class PaymentView(SessionMixin, DetailView):
         return context
 
 
-class ChargeView(SessionMixin):
+class ChargeView(SessionMixin):  # pragma: no cover
     http_method_names = ['post']
 
     def post(self, request, *args, **kwargs):
@@ -208,8 +208,6 @@ class StatusMixin:
     """
     def get_object(self):
         token = self.kwargs.get('token')
-        if token is None:
-            raise Http404()
         try:
             obj = Order.objects.verify_token(token)
             return obj

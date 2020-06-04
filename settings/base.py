@@ -53,7 +53,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'cart.middleware.CartTimeoutMiddleware',
-    'common.middleware.GeoIPMiddleware'
+    'common.middleware.GeoIPMiddleware',
+    'shop.middleware.ShopAvailableMiddleware'
 ]
 
 ROOT_URLCONF = 'zeesilver.urls'
@@ -276,3 +277,5 @@ SQUARE_PAYMENT_LIBRARY = os.environ.get('SQUARE_PAYMENT_LIBRARY')
 
 # Order settings
 ORDER_KEY = 'ORDER'
+# Shop modules for middleware
+SHOP_VIEWS = ('shop.views', 'cart.views')

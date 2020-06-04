@@ -59,7 +59,7 @@
 <div class="row justify-content-center">
   <div class="col-12 text-center">
     <a class="btn btn-secondary" href="{% url 'shop:invoice' token=object.token %}">View PDF Invoice</a>
-    <a id="resend" class="btn btn-secondary" href="{% url 'shop:email' token=object.token %}">Resend Order Email</a>
+    <a id="resend" class="btn btn-secondary" href="{% url 'shop:resend' token=object.token %}">Resend Order Email</a>
     <div id="message">
     </div>
   </div>

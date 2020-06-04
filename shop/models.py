@@ -45,7 +45,7 @@ class Order(BaseCustomer):
 
     def add_from_cart(self, cart):
         """
-        Unpacks the serialized session cart and add each to the instance's
+        Unpacks the serialized session cart and add each item to the instance's
         listing set
         """
         self.listing_set.add(*cart)
