@@ -1,35 +1,38 @@
-from django.template import loader
-from django.conf import settings
-from django.core.mail.message import EmailMultiAlternatives
 from celery.decorators import task
-from html2text import html2text
-from .models import Order
+from common.utils import get_site_name
+from .models import Order, Shipment
+from .utils import mail_customer
 
 
 @task(name='customer_order_notification')
-def customer_order_notification(order_pk, site_name):
+def customer_order_notification(order_pk):
     """
     Sends notification to customer after order is finalized
     """
     order = Order.objects.get(pk=order_pk)
-    # Render HTML email template
+    # Create template context
     context = {
-        'site_name': site_name,
-        'order': order
+        'order': order,
+        'site_name': get_site_name()
     }
-    body = loader.render_to_string('shop/order_email.html', context)
-    # Convert HTML body to plaintext as fallback
-    plain_text = html2text(body)
-
-    from_email, to = settings.DEFAULT_FROM_EMAIL, order.email
     subject = f'Your Order at Zeesilver - {order.number}'
+    to = order.email
+    template = 'shop/order_email.html'
+    mail_customer(template, context, subject, to)
 
-    email = EmailMultiAlternatives(
-        subject=subject,
-        body=plain_text,
-        from_email=from_email,
-        to=[to]
-    )
-    # Attach HTML version as alternative
-    email.attach_alternative(body, 'text/html')
-    email.send()
+
+@task(name='customer_tracking_notification')
+def customer_tracking_notification(shipment_pk):
+    """
+    Sends tracking number to customer after Shipping object is created
+    """
+    shipment = Shipment.objects.get(pk=shipment_pk)
+    # Create template context
+    context = {
+        'shipment': shipment,
+        'site_name': get_site_name()
+    }
+    subject = f'Tracking information for {shipment.order.number}'
+    to = shipment.order.email
+    template = 'shop/order_tracking_email.html'
+    mail_customer(template, context, subject, to)

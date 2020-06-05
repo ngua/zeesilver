@@ -2,6 +2,8 @@ from django.db import models
 from django.core import signing
 from django.urls import reverse
 from django.conf import settings
+from django.db.models import signals
+from django.dispatch import receiver
 from localflavor.us.models import USStateField, USZipCodeField
 from common.models import BaseCustomer
 from .managers import OrderManager, PaymentManager
@@ -119,7 +121,7 @@ class Order(BaseCustomer):
         return f"Order('{self.first_name}', '{self.last_name}', {self.email})"
 
     def __str__(self):
-        return self.number
+        return f'#{self.number}'
 
 
 class Payment(models.Model):
@@ -136,12 +138,25 @@ class Payment(models.Model):
         return f"Payment('{self.square_order_id}')"
 
     def __str__(self):
-        return f'Square Payment #{self.square_order_id}'
+        return f'#{self.square_order_id}'
+
+
+class Provider(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __repr__(self):
+        return f"Provider('{self.name}')"
+
+    def __str__(self):
+        return self.name
 
 
 class Shipment(models.Model):
+    provider = models.ForeignKey(
+        Provider, on_delete=models.SET_NULL, null=True
+    )
     created = models.DateTimeField(auto_now_add=True)
-    tracking = models.CharField(max_length=127, blank=True)
+    tracking = models.CharField(max_length=127)
     order = models.OneToOneField(Order, on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
@@ -156,4 +171,20 @@ class Shipment(models.Model):
         return f"Shipment('{self.tracking}')"
 
     def __str__(self):
-        return f'Shipment: Tracking #{self.tracking}'
+        return f'#{self.tracking}'
+
+
+@receiver(signals.post_save, sender=Shipment)
+def notify_customer(sender, instance, created, **kwargs):
+    """
+    Sends notification to customer when new shipment is created
+    """
+    if created:
+        # Avoid circular import with tasks module
+        from .tasks import customer_tracking_notification
+        # Call the task after short delay to ensure that transaction
+        # has been committed
+        customer_tracking_notification.apply_async(
+            kwargs={'shipment_pk': instance.pk},
+            countdown=1
+        )

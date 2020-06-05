@@ -1,0 +1,12 @@
+<p>Dear {{ shipment.order.name }},</p>
+<p>Your order, #{{ shipment.order.number }}, has been shipped:</p>
+<p><span style="font-weight: bold;">Provider</span>: {{ shipment.provider }}</p>
+<p><span style="font-weight: bold;">Tracking number</span>: {{ shipment.tracking }}</p>
+<p>You can continue to follow your order's status by clicking on the following link or pasting it inot your browser's URL bar</p>
+<p>{{  site_name }}{{ shipment.order.get_absolute_url }}</p>
+<p>
+  Again, please don't hesitate to reach out if you have any questions. This email address is not monitored for responses,
+  but you can get in touch through contact@zeesilver.com
+</p>
+<p>Best regards,</p>
+<p>Zee Silver</p>
