@@ -93,13 +93,22 @@ class OrderAdmin(CSVAdminMixin, admin.ModelAdmin):
         ordering = ('-created',)
 
 
+class HiddenModelAdmin:
+    """
+    Hide the model from main Admin index, while allowing actions from
+    inline. Simplifies interface for user
+    """
+    def get_model_perms(self, request):
+        return {}
+
+
 @admin.register(Shipment)
-class ShipmentAdmin(CSVAdminMixin, admin.ModelAdmin):
+class ShipmentAdmin(CSVAdminMixin, HiddenModelAdmin, admin.ModelAdmin):
     pass
 
 
 @admin.register(Payment)
-class PaymentAdmin(CSVAdminMixin, admin.ModelAdmin):
+class PaymentAdmin(CSVAdminMixin, HiddenModelAdmin, admin.ModelAdmin):
     pass
 
 

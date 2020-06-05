@@ -150,6 +150,10 @@ class Provider(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = 'shipping provider'
+        verbose_name_plural = 'shipping provider'
+
 
 class Shipment(models.Model):
     provider = models.ForeignKey(

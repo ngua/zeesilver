@@ -32,8 +32,12 @@
                   <td>{{ object.shipment.created }}</td>
                 </tr>
                 <tr>
+                  <th>Provider</th>
+                  <td>{{ object.shipment.provider|default:'No shipping provider available' }}</td>
+                </tr>
+                <tr>
                   <th>Tracking:</th>
-                  <td>{{ object.tracking|default:'No tracking information available' }}</td>
+                  <td>{{ object.shipment.tracking|default:'No tracking information available' }}</td>
                 </tr>
                 {% endif %}
               </tr>
@@ -52,17 +56,29 @@
             </table>
           </div>
         </div>
+        <div class="col text-center align-self-end">
+          <a
+            class="btn btn-secondary"
+            href="{% url 'shop:invoice' token=object.token %}"
+            data-toggle="tooltip"
+            data-placement="bottom"
+            title="View PDF invoice">
+            <i class="fas fa-file-pdf fa-2x"></i>
+          </a>
+          <a
+            class="btn btn-secondary"
+            href="{% url 'shop:resend' token=object.token %}"
+            data-toggle="tooltip"
+            data-placement="bottom"
+            title="Resend order confirmation email">
+            <i class="fas fa-envelope fa-2x"></i>
+          </a>
+        </div>
       </div>
     </div>
   </div>
 </div>
 <div class="row justify-content-center">
-  <div class="col-12 text-center">
-    <a class="btn btn-secondary" href="{% url 'shop:invoice' token=object.token %}">View PDF Invoice</a>
-    <a id="resend" class="btn btn-secondary" href="{% url 'shop:resend' token=object.token %}">Resend Order Email</a>
-    <div id="message">
-    </div>
-  </div>
 </div>
 {% endblock %}
 {% block body_js %}

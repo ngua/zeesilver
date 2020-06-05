@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django.contrib.flatpages',
     'django_filters',
     'djmoney',
     'ckeditor',
@@ -179,6 +180,11 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 # Site settings
 
 SITE_ID = 1
+
+# Admin site settings
+
+ADMIN_SITE_HEADER = 'Zeesilver Admin'
+ADMIN_SITE_TITLE = ADMIN_SITE_HEADER
 
 # Celery settings
 

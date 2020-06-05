@@ -13,11 +13,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-import os
 from django.contrib import admin
 from django.conf import settings
 from django.urls import path, include
 from django.conf.urls.static import static
+from django.contrib.flatpages import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,7 +31,14 @@ urlpatterns = [
     path('shop/', include('shop.urls')),
 ]
 
-if os.environ.get('DJANGO_SETTINGS_MODULE') == 'settings.dev':
+urlpatterns += [
+    path('about/', views.flatpage, {'url': 'about/'}, name='about')
+]
+
+admin.site.site_header = settings.ADMIN_SITE_HEADER
+admin.site.site_title = settings.ADMIN_SITE_TITLE
+
+if settings.DEBUG:
     urlpatterns += static(
         settings.STATIC_URL, document_root=settings.STATIC_ROOT
     )

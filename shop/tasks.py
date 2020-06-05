@@ -32,7 +32,7 @@ def customer_tracking_notification(shipment_pk):
         'shipment': shipment,
         'site_name': get_site_name()
     }
-    subject = f'Tracking information for {shipment.order.number}'
+    subject = f'Tracking information for #{shipment.order}'
     to = shipment.order.email
     template = 'shop/order_tracking_email.html'
     mail_customer(template, context, subject, to)

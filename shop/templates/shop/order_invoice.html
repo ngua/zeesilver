@@ -47,6 +47,8 @@
         {% endif %}
         {% if object.shipped %}
         <p><span class="label">Shipped on: </span>{{ object.shipment.created }}</p>
+        <p><span class="label">Provider: </span>{{ object.shipment.provider }}</p>
+        <p><span class="label">Tracking: </span>{{ object.shipment.tracking|default:'No tracking number available' }}</p>
         {% endif %}
       </div>
     </div>
