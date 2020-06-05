@@ -1,4 +1,3 @@
-from collections import namedtuple
 from djmoney.money import Money
 from listings.models import Category
 

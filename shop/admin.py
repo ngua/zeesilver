@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib import admin
 from django.http import HttpResponse
 from django.utils.html import format_html
-from .models import Order, Shipment, Payment
+from .models import Order, Shipment, Payment, Provider
 
 
 class CSVAdminMixin:
@@ -43,7 +43,7 @@ class ShipmentInline(admin.TabularInline):
     Create a Shipment instance from related order
     """
     model = Shipment
-    fields = ('tracking',)
+    fields = ('tracking', 'provider')
     show_change_link = True
 
 
@@ -100,4 +100,9 @@ class ShipmentAdmin(CSVAdminMixin, admin.ModelAdmin):
 
 @admin.register(Payment)
 class PaymentAdmin(CSVAdminMixin, admin.ModelAdmin):
+    pass
+
+
+@admin.register(Provider)
+class ProviderAdmin(admin.ModelAdmin):
     pass

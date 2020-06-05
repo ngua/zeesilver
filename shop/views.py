@@ -15,7 +15,6 @@ from django.views.generic import (
 )
 from django.views.generic.base import ContextMixin
 from django.views.generic.detail import SingleObjectMixin
-from django.contrib.sites.shortcuts import get_current_site
 from square.client import Client
 from common.tasks import notify_admins
 from cart.cart import Cart
@@ -154,6 +153,7 @@ class ChargeView(SessionMixin):  # pragma: no cover
             environment=settings.SQUARE_ENVIRONMENT
         )
         data = json.loads(request.body)
+        # Get nonce from client, return error if none provided
         nonce = data.get('nonce')
         if nonce is None:
             return self.charge_invalid()
@@ -169,17 +169,22 @@ class ChargeView(SessionMixin):  # pragma: no cover
             }
         }
         result = client.payments.create_payment(body)
+
         if result.is_success():
             return self.charge_valid(result)
+        elif result.is_error():
+            return self.charge_invalid(errors=result.errors)
         else:
+            # Invalidate order for any other unsuccessful outcome
             return self.charge_invalid()
 
     def charge_valid(self, result):
+        # Instantiate new Payment object with Square `result` object
         Payment.objects.from_response(result, self.object)
         self.object.finalize(self.request.session)
+        # Send email notifications to customer and site admins
         customer_order_notification.delay(
-            order_pk=self.object.pk,
-            site_name=str(get_current_site(self.request))
+            order_pk=self.object.pk
         )
         notify_admins.delay(
             subject='New Order at zeesilver.com',
@@ -188,15 +193,39 @@ class ChargeView(SessionMixin):  # pragma: no cover
                 {'order': self.object}
             )
         )
+        # Redirect from client with url
         return JsonResponse({'url': self.object.get_absolute_url()})
 
-    def charge_invalid(self):
+    def charge_invalid(self, errors=None):
+        # Create a human-readable error message to be flashed in messages
+        error_message = 'Unknown error'
+        if errors is not None:
+            error_message = {
+                'GENERIC_DECLINE': 'Your card was declined',
+                'ADDRESS_VERIFICATION_FAILURE': (
+                    'The zip code you provided could not be verified'
+                ),
+                'INVALID_EXPIRATION': (
+                    'The card expiration you provided was invalid'
+                ),
+                'CVV_FAILURE': (
+                    'The card CVV you provided was invalid'
+                )
+                # Square response `errors` attr is a list containing a
+                # single dict
+            }.get(errors[0].get('code'), error_message)
+
         cancel_order(
             instance=self.object,
             cart=self.cart,
             key=self.key,
             session=self.request.session
         )
+        messages.error(
+            self.request,
+            f"We're sorry, we couldn't complete your order: {error_message}"
+        )
+        # Return url for JS redirect
         return JsonResponse({'url': reverse('index')})
 
 
@@ -223,6 +252,9 @@ class OrderInvoiceView(StatusMixin, DetailView):
     template_name = 'shop/order_invoice.html'
 
     def get(self, request, *args, **kwargs):
+        """
+        Generates and displays PDF invoice of order instance
+        """
         self.object = self.get_object()
         context = self.get_context_data(**kwargs)
         buffer = io.BytesIO()
@@ -238,10 +270,12 @@ class OrderInvoiceView(StatusMixin, DetailView):
 
 class OrderResendEmailView(StatusMixin, DetailView):
     def get(self, request, *args, **kwargs):
+        """
+        Resends order confirmation email and sends success message to client
+        """
         self.object = self.get_object()
         customer_order_notification.delay(
-            order_pk=self.object.pk,
-            site_name=str(get_current_site(self.request))
+            order_pk=self.object.pk
         )
         return JsonResponse({
             'message': 'Order confirmation email sent!'
@@ -264,8 +298,7 @@ class CancelOrderView(SessionMixin, DeleteView):
 
     def delete(self, request, *args, **kwargs):
         """
-        Soft deletes order and clears session cart and
-        order information
+        Soft deletes order and clears session cart and order information
         """
         cancel_order(
             instance=self.get_object(),

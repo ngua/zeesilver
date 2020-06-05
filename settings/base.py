@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'django_filters',
     'djmoney',
     'ckeditor',
@@ -54,7 +55,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'cart.middleware.CartTimeoutMiddleware',
     'common.middleware.GeoIPMiddleware',
-    'shop.middleware.ShopAvailableMiddleware'
 ]
 
 ROOT_URLCONF = 'zeesilver.urls'
@@ -176,6 +176,9 @@ CACHES = {
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 
+# Site settings
+
+SITE_ID = 1
 
 # Celery settings
 
