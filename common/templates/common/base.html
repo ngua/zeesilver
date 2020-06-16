@@ -1,4 +1,4 @@
-{% load static %}
+{% load static flatpages %}
 <!DOCTYPE html>
 <html>
   <head>
@@ -12,7 +12,7 @@
     {% block head %}{% endblock %}
   </head>
   <body>
-    <div class="d-flex flex-column body-wrapper">
+    <div class="d-flex flex-column">
       <nav class="navbar fixed-top navbar-expand-md" role="navigation">
         <div class="container">
           <div class="nav-wrapper">
@@ -25,8 +25,20 @@
           <div class="collapse navbar-collapse" id="navbar-toggle">
             <div class="navbar-nav mr-auto">
               <a class="nav-item nav-link my-1" href="{% url 'listing:filter' %}">Gallery</a>
-              <a class="nav-item nav-link my-1" href="">About</a>
               <a class="nav-item nav-link my-1" href="{% url 'contact' %}">Contact</a>
+              <div class="nav-item nav-link my-1 dropdown show">
+                {% get_flatpages as flatpages %}
+                {% if flatpages %}
+                <a id="dropdown" href="" data-toggle="dropdown">
+                  <i class="fas fa-ellipsis-h"></i>
+                </a>
+                <div class="dropdown-menu">
+                  {% for page in flatpages %}
+                  <a class="dropdown-item" href="{{ page.url }}">{{ page.title }}</a>
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
             </div>
             <div class="navbar-nav ml-auto">
               <div>
@@ -104,7 +116,7 @@
               <a href="{% url 'contact' %}" data-toggle="tooltip" title="Contact">
                 <span class="far fa-address-book fa-sm mx-1" style="color: gray;"></span>
               </a>
-              <a href="" data-toggle="tooltip" title="About">
+              <a href="{% url 'about' %}" data-toggle="tooltip" title="About">
                 <span class="fas fa-info-circle fa-sm mx-1" style="color: gray;"></span>
               </a>
             </div>

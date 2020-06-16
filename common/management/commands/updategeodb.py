@@ -36,7 +36,6 @@ class Command(BaseCommand):
         with cd(self.geoip_path):
             for db_name, url in self.databases.items():
                 self.fetch_archives(db_name, url)
-        self.stdout.write(self.style.SUCCESS('GeoIP database updated'))
 
     def fetch_archives(self, db_name, url):
         """

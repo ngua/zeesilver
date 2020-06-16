@@ -8,18 +8,6 @@ class User(AbstractUser):
     pass
 
 
-class UserProxy(User):
-    """
-    Proxy model to return User to `auth` group
-    """
-    pass
-
-    class Meta:
-        proxy = True
-        app_label = 'auth'
-        verbose_name = 'user'
-
-
 class BaseCustomer(models.Model):
     """
     Base class for creating customer/contact models

@@ -1,3 +1,4 @@
+import time
 from django.db import models
 from django.core import signing
 from django.urls import reverse
@@ -80,7 +81,12 @@ class Order(BaseCustomer):
         """
         Creates representation of the order to be saved in the session
         """
-        return {'number': self.number, 'status': self.status}
+        return {
+            'number': self.number,
+            'status': self.status,
+            # Store when client was last active for timeout middleware
+            'active': time.time()
+        }
 
     def token(self):
         """

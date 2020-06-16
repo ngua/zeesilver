@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.conf import settings
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf.urls.static import static
 from django.contrib.flatpages import views
 
@@ -32,7 +32,9 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    path('about/', views.flatpage, {'url': 'about/'}, name='about')
+    path('about/', views.flatpage, {'url': '/about/'}, name='about'),
+    path('policies/', views.flatpage, {'url': '/policies/'}, name='policies'),
+    re_path(r'^(P?<url>.*/)$', views.flatpage)
 ]
 
 admin.site.site_header = settings.ADMIN_SITE_HEADER

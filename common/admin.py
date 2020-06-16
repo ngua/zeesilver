@@ -5,7 +5,7 @@ from django.contrib.flatpages.admin import FlatPageAdmin
 from django.contrib.flatpages.models import FlatPage
 from ckeditor.widgets import CKEditorWidget
 from solo.admin import SingletonModelAdmin
-from .models import UserProxy, Carousel, Slide
+from .models import User, Carousel, Slide
 
 
 admin.site.unregister(FlatPage)
@@ -28,4 +28,4 @@ class CarouselAdmin(SingletonModelAdmin):
 
 
 admin.site.register(Slide)
-admin.site.register(UserProxy, UserAdmin)
+admin.site.register(User, UserAdmin)

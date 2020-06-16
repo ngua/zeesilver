@@ -1,4 +1,5 @@
 import io
+import time
 import json
 import weasyprint
 from uuid import uuid4
@@ -69,6 +70,15 @@ class SessionMixin(SingleObjectMixin, OrderMixin):
     """
     queryset = Order.objects.all()
 
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Updates the `active` value to record client activity and avoid order
+        timeout from middleware
+        """
+        request.session[self.key]['active'] = time.time()
+        request.session.modified = True
+        return super().dispatch(request, *args, **kwargs)
+
     def get_object(self):
         """
         Tries to retrieve Order instance from serialized representation in the
@@ -77,7 +87,7 @@ class SessionMixin(SingleObjectMixin, OrderMixin):
         order = self.request.session.get(self.key)
         if order is None:
             raise Http404('No Order Found')
-        number, _ = order.values()
+        number, *_ = order.values()
         return self.queryset.get(number=number)
 
 

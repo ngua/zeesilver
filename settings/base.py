@@ -56,6 +56,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'cart.middleware.CartTimeoutMiddleware',
     'common.middleware.GeoIPMiddleware',
+    'shop.middleware.OrderTimeoutMiddleware'
 ]
 
 ROOT_URLCONF = 'zeesilver.urls'
@@ -286,5 +287,7 @@ SQUARE_PAYMENT_LIBRARY = os.environ.get('SQUARE_PAYMENT_LIBRARY')
 
 # Order settings
 ORDER_KEY = 'ORDER'
+# Timeout value, in seconds, before unpaid orders are canceled
+ORDER_TIMEOUT = 3600
 # Shop modules for middleware
 SHOP_VIEWS = ('shop.views', 'cart.views')

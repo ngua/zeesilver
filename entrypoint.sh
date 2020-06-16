@@ -15,8 +15,9 @@ export PYTHONPATH=$(pwd)
 python manage.py flush --no-input --settings=$DJANGO_SETTINGS_MODULE
 python manage.py makemigrations --no-input --settings=$DJANGO_SETTINGS_MODULE
 python manage.py migrate --settings=$DJANGO_SETTINGS_MODULE
-echo "from django.contrib.auth import get_user_model; User = get_user_model(); \
-    User.objects.create_superuser($SU_USERNAME, $SU_EMAIL, $SU_PASSWORD)" | python manage.py shell --settings=$DJANGO_SETTINGS_MODULE
+python -c "import django; django.setup(); \
+    from django.contrib.auth.management.commands.createsuperuser import get_user_model;\
+    get_user_model().objects.create_superuser('$SU_USERNAME', '$SU_EMAIL', '$SU_PASSWORD')"
 python manage.py loaddata listings/fixtures/listings.yaml --settings=$DJANGO_SETTINGS_MODULE
 python manage.py loaddata common/fixtures/common.yaml --settings=$DJANGO_SETTINGS_MODULE
 
