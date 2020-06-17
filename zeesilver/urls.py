@@ -53,6 +53,10 @@ urlpatterns += [
 admin.site.site_header = settings.ADMIN_SITE_HEADER
 admin.site.site_title = settings.ADMIN_SITE_TITLE
 
+handler403 = 'common.views.handler_403'
+handler404 = 'common.views.handler_404'
+handler500 = 'common.views.handler_500'
+
 if settings.DEBUG:
     urlpatterns += static(
         settings.STATIC_URL, document_root=settings.STATIC_ROOT
@@ -61,8 +65,16 @@ if settings.DEBUG:
         settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
     )
 
-if settings.DEBUG:
     import debug_toolbar
     urlpatterns = [
         path('__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
+
+    from common.views import handler_404
+
+    def test_404(request):
+        return handler_404(request, None)
+
+    urlpatterns += [
+        path('404/', test_404),
+    ]

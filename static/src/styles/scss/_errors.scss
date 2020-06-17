@@ -1,0 +1,14 @@
+@import 'vars';
+
+.error {
+  background: $light-grey;
+  padding: 20px;
+
+  h1 {
+    font-family: $beth-ellen;
+  }
+
+  p {
+    font-family: $crimson;
+  }
+}

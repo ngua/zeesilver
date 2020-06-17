@@ -1,0 +1,15 @@
+{% extends "common/base.html" %}
+{% block title %}
+{{ status }}
+{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-sm-12">
+    <div class="jumbotron-fluid error">
+      <h1 class="display-4">{{ status }}</h1>
+      <p class="lead">{% block lead %}{% endblock %}</p>
+      <p>{% block message %}{% endblock %}</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

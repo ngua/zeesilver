@@ -12,3 +12,20 @@ def index(request):
         'carousel': carousel
     }
     return render(request, 'common/index.html', context=context)
+
+# Errors
+
+
+def handler_404(request, exception):
+    status = 404
+    return render(request, 'errors/404.html', {'status': status})
+
+
+def handler_403(request, exception):
+    status = 403
+    return render(request, 'errors/403.html', {'status': status})
+
+
+def handler_500(request):
+    status = 500
+    return render(request, 'errors/500.html', {'status': status})
