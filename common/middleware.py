@@ -50,11 +50,14 @@ class GeoIPMiddleware:
         # Including proxy parameters helps mitigate client IP spoofing to some
         # degree; good practice even if this middleware is not used for
         # something truly critical
-        client_ip, is_routable = get_client_ip(
-            request,
-            proxy_count=self.proxy_count,
-            proxy_trusted_ips=self.proxy_trusted_ips
-        )
+        if settings.DEBUG:
+            client_ip, is_routable = get_client_ip(request)
+        else:
+            client_ip, is_routable = get_client_ip(
+                request,
+                proxy_count=self.proxy_count,
+                proxy_trusted_ips=self.proxy_trusted_ips
+            )
         # If client's ip can't be established, or is private, etc, return and
         # call view function rather than spuriously redirecting. This also
         # prevents repeatedly making invalid queries later

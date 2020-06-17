@@ -1,3 +1,4 @@
+import secrets
 from django.db import models, transaction
 from django.urls import reverse
 from django.conf import settings
@@ -80,11 +81,21 @@ class Listing(models.Model):
         affect existing slug, otherwise existing URLs might 404
         2. Call a celery tasks to update the instance's `search_vector`
         by aggregating newly saved data, updating the field, and then re-
-        saving, the instance, making sure that `save` is not being called
+        saving the instance, making sure that `save` is not being called
         specifically to update the search vector
         """
         if not self.id:
-            self.slug = slugify(self.name)
+            slug = slugify(self.name)
+            # Ensure that slug is unique
+            if self.__class__.objects.filter(slug=slug).exists():
+                while True:
+                    # Use random token to avoid exposing application internals
+                    # to clients (i.e., by using instance pk)
+                    token = secrets.token_urlsafe(4)
+                    slug += token
+                    if not self.__class__.objects.filter(slug=slug).exists():
+                        break
+            self.slug = slug
         super().save(*args, **kwargs)
         if 'search_vector' not in kwargs.get('update_fields', {}):
             from .tasks import update_search
@@ -115,6 +126,9 @@ class Listing(models.Model):
 def auto_delete_picture(sender, instance, **kwargs):
     instance.picture.delete(save=False)
 
+
+# The following signals call the instance `save` method to update the search
+# vector when related objects are updated
 
 @receiver(signals.post_save, sender=Category)
 def category_updated(sender, instance, **kwargs):

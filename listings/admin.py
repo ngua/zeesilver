@@ -6,6 +6,7 @@ from .models import Category, Listing, Material
 class ListingAdmin(admin.ModelAdmin):
     list_display = ('name', 'category', 'sold', 'price', 'display_materials')
     list_filter = ('category', 'sold', 'materials')
+    readonly_fields = ('order', 'slug')
 
     def display_materials(self, obj):
         """
