@@ -21,6 +21,7 @@ from django.contrib.flatpages import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('baton/', include('baton.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('', include('common.urls')),
     path('gallery/', include('listings.urls')),

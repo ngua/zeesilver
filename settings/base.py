@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from datetime import datetime
 import moneyed
 from django.contrib.messages import constants as message_constants
 from moneyed.localization import _FORMATTER
@@ -21,6 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Application definition
 
 INSTALLED_APPS = [
+    'baton',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -37,6 +39,7 @@ INSTALLED_APPS = [
     'honeypot',
     'solo',
     'localflavor',
+    'baton.autodiscover',
     'common',
     'search',
     'cart',
@@ -246,6 +249,22 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Honeypot
 HONEYPOT_FIELD_NAME = 'phonenumber'
+
+# Django baton admin settings
+
+BATON = {
+    'SITE_HEADER': ADMIN_SITE_HEADER,
+    'SITE_TITLE': ADMIN_SITE_TITLE,
+    'INDEX_TITLE': ADMIN_SITE_HEADER,
+    'SUPPORT_HREF': f'mailto:{os.environ.get("SU_EMAIL")}',
+    'COPYRIGHT': f'copyright © {2019}-{datetime.utcnow().strftime("%Y")} Zee Silver', # noqa
+    'POWERED_BY': '<a href="https://gitlab.com/ngua">ngua</a>',
+    'CONFIRM_UNSAVED_CHANGES': True,
+    'SHOW_MULTIPART_UPLOADING': True,
+    'ENABLE_IMAGES_PREVIEW': True,
+    'CHANGELIST_FILTERS_IN_MODAL': True,
+    'MENU_ALWAYS_COLLAPSED': False,
+}
 
 # Geoip settings
 
