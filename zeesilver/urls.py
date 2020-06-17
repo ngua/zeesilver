@@ -18,6 +18,14 @@ from django.conf import settings
 from django.urls import path, include, re_path
 from django.conf.urls.static import static
 from django.contrib.flatpages import views
+from django.contrib.sitemaps.views import sitemap
+from common.sitemaps import StaticSiteMap
+from listings.sitemaps import ListingSiteMap
+
+sitemaps = {
+    'listings': ListingSiteMap,
+    'static': StaticSiteMap
+}
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,6 +38,10 @@ urlpatterns = [
     path('cart/', include('cart.urls')),
     path('merchant/', include('merchant.urls')),
     path('shop/', include('shop.urls')),
+    path(
+        'sitemap.xml', sitemap, {'sitemaps': sitemaps},
+        name='django.contrib.sitemaps.views.sitemap'
+    ),
 ]
 
 urlpatterns += [

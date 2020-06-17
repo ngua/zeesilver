@@ -1,8 +1,12 @@
 {% extends "common/base.html" %}
+{% load zeesilver_extras %}
 {% block title %}{{ flatpage.title }}{{ block.super }}{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
   <div class="col col-lg-8 col-sm-12">
+    <div class="m-3">
+      {% legend flatpage.title %}
+    </div>
     {{ flatpage.content }}
   </div>
 </div>

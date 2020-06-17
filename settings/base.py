@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django.contrib.flatpages',
+    'django.contrib.sitemaps',
     'django_filters',
     'djmoney',
     'ckeditor',
@@ -262,7 +263,7 @@ BATON = {
     'CONFIRM_UNSAVED_CHANGES': True,
     'SHOW_MULTIPART_UPLOADING': True,
     'ENABLE_IMAGES_PREVIEW': True,
-    'CHANGELIST_FILTERS_IN_MODAL': True,
+    'CHANGELIST_FILTERS_IN_MODAL': False,
     'MENU_ALWAYS_COLLAPSED': False,
 }
 
