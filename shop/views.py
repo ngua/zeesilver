@@ -12,7 +12,11 @@ from django.urls import reverse_lazy, reverse
 from django.http import Http404, JsonResponse, FileResponse
 from django.core.signing import BadSignature
 from django.views.generic import (
-    View, CreateView, DetailView, DeleteView, UpdateView
+    View,
+    CreateView,
+    DetailView,
+    DeleteView,
+    UpdateView,
 )
 from django.views.generic.base import ContextMixin
 from django.views.generic.detail import SingleObjectMixin
@@ -29,18 +33,23 @@ class ProgressMixin(ContextMixin):
     """
     Adds order steps and current progress to context for display in template
     """
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update({
-            # Add checkout steps to context for users to see progress
-            'steps': OrderedDict([
-                ('Shipping Information', 'OrderCreateView'),
-                ('Review Your Order', 'ReviewOrderView'),
-                ('Payment', 'PaymentView')
-            ]),
-            # Get current view name to style with CSS in template
-            'current': self.__class__.__name__
-        })
+        context.update(
+            {
+                # Add checkout steps to context for users to see progress
+                'steps': OrderedDict(
+                    [
+                        ('Shipping Information', 'OrderCreateView'),
+                        ('Review Your Order', 'ReviewOrderView'),
+                        ('Payment', 'PaymentView'),
+                    ]
+                ),
+                # Get current view name to style with CSS in template
+                'current': self.__class__.__name__,
+            }
+        )
         return context
 
 
@@ -48,6 +57,7 @@ class OrderMixin(ProgressMixin, View):
     """
     Instantiates session cart for order views
     """
+
     http_method_names = ['get', 'post']
 
     def setup(self, request, *args, **kwargs):
@@ -68,6 +78,7 @@ class SessionMixin(SingleObjectMixin, OrderMixin):
     """
     Retrieves serialized order from session
     """
+
     queryset = Order.objects.all()
 
     def dispatch(self, request, *args, **kwargs):
@@ -131,10 +142,9 @@ class UpdateOrderView(SessionMixin, UpdateView):
         """
         context = super().get_context_data(**kwargs)
         # Change the current step back to create view
-        context.update({
-            'current': 'OrderCreateView',
-            'action': reverse('shop:update')
-        })
+        context.update(
+            {'current': 'OrderCreateView', 'action': reverse('shop:update')}
+        )
         return context
 
 
@@ -144,12 +154,14 @@ class PaymentView(SessionMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Add necessary context to include in json_script tags
-        context.update({
-            'square_application_id': settings.SQUARE_APPLICATION_ID,
-            'payment_url': reverse('shop:charge'),
-            'amount': self.object.total,
-            'square_payment_library': settings.SQUARE_PAYMENT_LIBRARY
-        })
+        context.update(
+            {
+                'square_application_id': settings.SQUARE_APPLICATION_ID,
+                'payment_url': reverse('shop:charge'),
+                'amount': self.object.total,
+                'square_payment_library': settings.SQUARE_PAYMENT_LIBRARY,
+            }
+        )
         return context
 
 
@@ -160,7 +172,7 @@ class ChargeView(SessionMixin):  # pragma: no cover
         self.object = self.get_object()
         client = Client(
             access_token=settings.SQUARE_ACCESS_TOKEN,
-            environment=settings.SQUARE_ENVIRONMENT
+            environment=settings.SQUARE_ENVIRONMENT,
         )
         data = json.loads(request.body)
         # Get nonce from client, return error if none provided
@@ -173,10 +185,7 @@ class ChargeView(SessionMixin):  # pragma: no cover
         body = {
             'source_id': nonce,
             'idempotency_key': idempotency_key,
-            'amount_money': {
-                'currency': currency,
-                'amount': amount
-            }
+            'amount_money': {'currency': currency, 'amount': amount},
         }
         result = client.payments.create_payment(body)
 
@@ -193,15 +202,12 @@ class ChargeView(SessionMixin):  # pragma: no cover
         Payment.objects.from_response(result, self.object)
         self.object.finalize(self.request.session)
         # Send email notifications to customer and site admins
-        customer_order_notification.delay(
-            order_pk=self.object.pk
-        )
+        customer_order_notification.delay(order_pk=self.object.pk)
         notify_admins.delay(
             subject='New Order at zeesilver.com',
             body=loader.render_to_string(
-                'shop/order_admin_email.html',
-                {'order': self.object}
-            )
+                'shop/order_admin_email.html', {'order': self.object}
+            ),
         )
         # Redirect from client with url
         return JsonResponse({'url': self.object.get_absolute_url()})
@@ -218,9 +224,7 @@ class ChargeView(SessionMixin):  # pragma: no cover
                 'INVALID_EXPIRATION': (
                     'The card expiration you provided was invalid'
                 ),
-                'CVV_FAILURE': (
-                    'The card CVV you provided was invalid'
-                )
+                'CVV_FAILURE': ('The card CVV you provided was invalid')
                 # Square response `errors` attr is a list containing a
                 # single dict
             }.get(errors[0].get('code'), error_message)
@@ -229,11 +233,11 @@ class ChargeView(SessionMixin):  # pragma: no cover
             instance=self.object,
             cart=self.cart,
             key=self.key,
-            session=self.request.session
+            session=self.request.session,
         )
         messages.error(
             self.request,
-            f"We're sorry, we couldn't complete your order: {error_message}"
+            f"We're sorry, we couldn't complete your order: {error_message}",
         )
         # Return url for JS redirect
         return JsonResponse({'url': reverse('index')})
@@ -245,6 +249,7 @@ class StatusMixin:
     """
     Retrieves and decodes token from url kwarg
     """
+
     def get_object(self):
         token = self.kwargs.get('token')
         try:
@@ -284,12 +289,8 @@ class OrderResendEmailView(StatusMixin, DetailView):
         Resends order confirmation email and sends success message to client
         """
         self.object = self.get_object()
-        customer_order_notification.delay(
-            order_pk=self.object.pk
-        )
-        return JsonResponse({
-            'message': 'Order confirmation email sent!'
-        })
+        customer_order_notification.delay(order_pk=self.object.pk)
+        return JsonResponse({'message': 'Order confirmation email sent!'})
 
 
 class CancelOrderView(SessionMixin, DeleteView):
@@ -314,7 +315,7 @@ class CancelOrderView(SessionMixin, DeleteView):
             instance=self.get_object(),
             cart=self.cart,
             key=self.key,
-            session=request.session
+            session=request.session,
         )
         messages.info(request, 'Your order has been canceled')
         return redirect(self.success_url)

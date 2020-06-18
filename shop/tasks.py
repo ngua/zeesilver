@@ -11,10 +11,7 @@ def customer_order_notification(order_pk):
     """
     order = Order.objects.get(pk=order_pk)
     # Create template context
-    context = {
-        'order': order,
-        'site_name': get_site_name()
-    }
+    context = {'order': order, 'site_name': get_site_name()}
     subject = f'Your Order at Zeesilver - {order.number}'
     to = order.email
     template = 'shop/order_email.html'
@@ -28,10 +25,7 @@ def customer_tracking_notification(shipment_pk):
     """
     shipment = Shipment.objects.get(pk=shipment_pk)
     # Create template context
-    context = {
-        'shipment': shipment,
-        'site_name': get_site_name()
-    }
+    context = {'shipment': shipment, 'site_name': get_site_name()}
     subject = f'Tracking information for #{shipment.order}'
     to = shipment.order.email
     template = 'shop/order_tracking_email.html'

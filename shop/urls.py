@@ -11,8 +11,18 @@ urlpatterns = [
     path('update/', views.UpdateOrderView.as_view(), name='update'),
     path('pay/', views.PaymentView.as_view(), name='pay'),
     path('charge/', views.ChargeView.as_view(), name='charge'),
-    path('status/<str:token>/', views.OrderStatusView.as_view(), name='status'),
-    path('invoice/<str:token>/', views.OrderInvoiceView.as_view(), name='invoice'),
-    path('resend/<str:token>/', views.OrderResendEmailView.as_view(), name='resend'),
+    path(
+        'status/<str:token>/', views.OrderStatusView.as_view(), name='status'
+    ),
+    path(
+        'invoice/<str:token>/',
+        views.OrderInvoiceView.as_view(),
+        name='invoice',
+    ),
+    path(
+        'resend/<str:token>/',
+        views.OrderResendEmailView.as_view(),
+        name='resend',
+    ),
     path('cancel/', views.CancelOrderView.as_view(), name='cancel'),
 ]

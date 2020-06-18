@@ -23,25 +23,31 @@ class OrderForm(forms.ModelForm):
                     Div('first_name', css_class='col-md-4 mb-3'),
                     Div('last_name', css_class='col-md-4 mb-3'),
                     Div('email', css_class='col-md-4 mb-3'),
-                    css_class='form-row'
+                    css_class='form-row',
                 ),
                 Div(
                     Div('phone', css_class='col-md-4 mb-3'),
                     Div('street_address', css_class='col-md-8 mb-3'),
-                    css_class='form-row'
+                    css_class='form-row',
                 ),
                 Div(
                     Div('city', css_class='col-md-6 mb-3'),
                     Div('state', css_class='col-md-4 mb-3'),
                     Div('zip_code', css_class='col-md-2 mb-3'),
-                    css_class='form-row'
-                )
+                    css_class='form-row',
+                ),
             )
         )
 
     class Meta:
         model = Order
         fields = [
-            'first_name', 'last_name', 'email', 'phone', 'street_address',
-            'city', 'state', 'zip_code'
+            'first_name',
+            'last_name',
+            'email',
+            'phone',
+            'street_address',
+            'city',
+            'state',
+            'zip_code',
         ]

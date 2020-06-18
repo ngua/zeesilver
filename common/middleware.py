@@ -22,6 +22,7 @@ class GeoIPMiddleware:
     TODO Add C mmdb library; decouple GeoIP2 instance from wsgi app and into
     dedicated service with own memory
     """
+
     def __init__(self, get_response):
         self.get_response = get_response
         self.whitelist = getattr(settings, 'GEO_WHITELIST', ('US',))
@@ -56,7 +57,7 @@ class GeoIPMiddleware:
             client_ip, is_routable = get_client_ip(
                 request,
                 proxy_count=self.proxy_count,
-                proxy_trusted_ips=self.proxy_trusted_ips
+                proxy_trusted_ips=self.proxy_trusted_ips,
             )
         # If client's ip can't be established, or is private, etc, return and
         # call view function rather than spuriously redirecting. This also
@@ -76,7 +77,7 @@ class GeoIPMiddleware:
                     'Zeesilver is currently only able to accept payment '
                     'from and offer shipping to customers in the US. We '
                     'apologize for any inconvenience.'
-                )
+                ),
             )
             return redirect(reverse('index'))
         return

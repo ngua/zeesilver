@@ -10,6 +10,7 @@ class CSVAdminMixin:
     """
     Mixin to generate CSV files for given qs
     """
+
     actions = ['export']
 
     def export(self, request, queryset):
@@ -19,20 +20,21 @@ class CSVAdminMixin:
         opts = self.opts
         # Create response object and set content header
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = (
-            f'attachment; filename="{opts.verbose_name}.csv"'
-        )
+        response[
+            'Content-Disposition'
+        ] = f'attachment; filename="{opts.verbose_name}.csv"'
         # Exclude related models from exported fields
         fields = [
-            field for field in opts.get_fields()
+            field
+            for field in opts.get_fields()
             if not field.one_to_many and not field.one_to_one
         ]
         writer = csv.writer(response)
         writer.writerow([field.verbose_name for field in fields])
         for instance in queryset:
-            writer.writerow([
-                getattr(instance, field.name) for field in fields
-            ])
+            writer.writerow(
+                [getattr(instance, field.name) for field in fields]
+            )
         return response
 
     export.short_description = 'Export to CSV file'
@@ -42,6 +44,7 @@ class ShipmentInline(admin.TabularInline):
     """
     Create a Shipment instance from related order
     """
+
     model = Shipment
     fields = ('tracking', 'provider')
     show_change_link = True
@@ -57,8 +60,17 @@ class PaymentInline(admin.TabularInline):
 @admin.register(Order)
 class OrderAdmin(CSVAdminMixin, admin.ModelAdmin):
     list_display = (
-        'number', 'name', 'email', 'address', 'total', 'status',
-        'created', 'items', 'invoice', 'receipt', 'tracking'
+        'number',
+        'name',
+        'email',
+        'address',
+        'total',
+        'status',
+        'created',
+        'items',
+        'invoice',
+        'receipt',
+        'tracking',
     )
     list_filter = ('status', 'created')
     inlines = [ShipmentInline, PaymentInline]
@@ -69,9 +81,7 @@ class OrderAdmin(CSVAdminMixin, admin.ModelAdmin):
     @staticmethod
     def invoice(obj):
         url = reverse('shop:invoice', kwargs={'token': obj.token()})
-        return format_html(
-            '<a href={}>{}</a>', url, 'Invoice'
-        )
+        return format_html('<a href={}>{}</a>', url, 'Invoice')
 
     @staticmethod
     def receipt(obj):
@@ -85,9 +95,7 @@ class OrderAdmin(CSVAdminMixin, admin.ModelAdmin):
     invoice.short_description = 'Invoice'
 
     def items(self, obj):
-        return ', '.join(
-            [listing.name for listing in obj.listing_set.all()]
-        )
+        return ', '.join([listing.name for listing in obj.listing_set.all()])
 
     class Meta:
         ordering = ('-created',)
@@ -98,6 +106,7 @@ class HiddenModelAdmin:
     Hide the model from main Admin index, while allowing actions from
     inline. Simplifies interface for user
     """
+
     def get_model_perms(self, request):
         return {}
 

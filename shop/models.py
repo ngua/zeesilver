@@ -11,7 +11,6 @@ from .managers import OrderManager, PaymentManager
 
 
 class Order(BaseCustomer):
-
     class Status(models.IntegerChoices):
         UNPAID = 1
         PAID = 2
@@ -74,7 +73,7 @@ class Order(BaseCustomer):
             'Name': self.name,
             'Address': self.address,
             'Phone': self.phone,
-            'Email': self.email
+            'Email': self.email,
         }
 
     def serialize(self):
@@ -85,7 +84,7 @@ class Order(BaseCustomer):
             'number': self.number,
             'status': self.status,
             # Store when client was last active for timeout middleware
-            'active': time.time()
+            'active': time.time(),
         }
 
     def token(self):
@@ -192,9 +191,9 @@ def notify_customer(sender, instance, created, **kwargs):
     if created:
         # Avoid circular import with tasks module
         from .tasks import customer_tracking_notification
+
         # Call the task after short delay to ensure that transaction
         # has been committed
         customer_tracking_notification.apply_async(
-            kwargs={'shipment_pk': instance.pk},
-            countdown=1
+            kwargs={'shipment_pk': instance.pk}, countdown=1
         )

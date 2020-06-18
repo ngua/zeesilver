@@ -19,9 +19,9 @@ class OrderManager(models.Manager):
         consistent length
         """
         while True:
-            number = '-'.join(re.findall(
-                r'\d{4}', str(int(secrets.token_hex(6), 16))
-            ))
+            number = '-'.join(
+                re.findall(r'\d{4}', str(int(secrets.token_hex(6), 16)))
+            )
             if len(number) == 14:
                 return number
 
@@ -47,6 +47,6 @@ class PaymentManager(models.Manager):
             'square_order_id': payment.get('order_id', ''),
             'receipt_number': payment.get('receipt_number', ''),
             'receipt_url': payment.get('receipt_url', ''),
-            'order': order
+            'order': order,
         }
         return self.create(**params)
