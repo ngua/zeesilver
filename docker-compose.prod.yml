@@ -1,0 +1,75 @@
+version: '3'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    expose:
+      - 8002
+    image: zeesilver
+    command: gunicorn zeesilver.wsgi:application --bind 0.0.0.0:8002 --workers=3
+    volumes:
+      - static:/home/app/web/staticfiles
+      - media:/home/app/web/mediafiles
+      - geoip2:/geoip2
+    env_file:
+      - ./.env.prod
+    networks:
+      - app
+      - proxy
+    restart: unless-stopped
+
+  celery:
+    volumes:
+      - celery_data:/var/run/celery/
+      - geoip2:/geoip2
+    command: >
+      celery -A zeesilver worker
+      -E
+      -l warning
+      --pidfile=/var/run/celery/celeryworker.pid
+    env_file:
+      - ./.env.prod
+    networks:
+      - app
+
+  celery-beat:
+    volumes:
+      - celery_data:/var/run/celery/
+      - geoip2:/geoip2
+    command: >
+      celery -A zeesilver beat
+      -l warning
+      --schedule=/var/run/celery/celerybeat-schedule
+      --pidfile=/var/run/celery/celerybeat.pid
+    env_file:
+      - ./.env.prod
+    networks:
+      - app
+
+  redis:
+    command: ['redis-server', '/etc/redis/redis.conf', '--port', '6382']
+    user: "1001"
+    volumes:
+      - redis_data:/var/libredis/data
+      - ./redis/redis.conf:/etc/redis/redis.conf
+    networks:
+      - app
+    restart: always
+    ports:
+      - "6382:6382"
+
+volumes:
+  redis_data:
+  celery_data:
+  static:
+  media:
+  geoip2:
+
+networks:
+  app:
+  proxy:
+    external:
+      name: nginx-proxy
+

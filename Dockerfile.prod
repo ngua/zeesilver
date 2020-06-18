@@ -1,0 +1,61 @@
+# Build
+
+FROM python:3.8.2-slim-buster as builder
+
+WORKDIR /static
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+RUN apt-get update && apt-get install -y curl libpq-dev gcc libcairo2-dev \
+        libffi-dev python-lxml shared-mime-info libpango1.0-0 libcairo2 libgdk-pixbuf2.0-0
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+RUN apt-get install -y nodejs
+
+COPY ./static/ .
+
+WORKDIR /static/src
+RUN npm install
+RUN npm run scss:compile
+
+WORKDIR /app
+
+COPY ./requirements /app/requirements
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements/prod.txt
+
+# Final
+
+FROM python:3.8.2-slim-buster
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+RUN apt-get update && apt-get install -y libpq-dev gcc libcairo2-dev \
+        libffi-dev python-lxml shared-mime-info libpango1.0-0 libcairo2 libgdk-pixbuf2.0-0
+
+COPY --from=builder /app/wheels /wheels
+COPY --from=builder /app/requirements/prod.txt .
+RUN pip install --no-cache /wheels/*
+
+RUN apt-get autoremove -y gcc
+
+ENV USERNAME=app
+ENV UID=1000
+RUN addgroup --system --gid $UID $USERNAME && adduser --disabled-password --gecos '' --system --uid $UID $USERNAME
+ENV APP_HOME=/home/app/web
+RUN mkdir /home/app/web
+RUN mkdir $APP_HOME/staticfiles
+RUN mkdir $APP_HOME/mediafiles
+
+WORKDIR $APP_HOME
+COPY . $APP_HOME
+COPY --from=builder /static/styles $APP_HOME/static/styles/
+
+RUN chown -R $USERNAME:$USERNAME $APP_HOME
+RUN chown -R $USERNAME:$USERNAME $APP_HOME/staticfiles
+RUN chown -R $USERNAME:$USERNAME $APP_HOME/mediafiles
+# Cannot dockerignore this directory, needed for build stage above
+RUN rm -r $APP_HOME/static/src/
+RUN mkdir -p /var/run/celery
+RUN chown -R $USERNAME:$USERNAME /var/run/celery
+
+USER $USERNAME
